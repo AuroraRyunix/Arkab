@@ -15,6 +15,8 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-10-16
+
 - [Feature] **The board drivers, moved out of Alnasl and renamed `Arkab.*`.** The DGT serial protocol, the single board, the loop and its bus, the emulator, the UART and fake transports, the capture format and its recorder, and the replay player. The code now exists once, here, and Alnasl uses it as a library. Started as a library, Arkab starts nothing at all; it was only moved, not promoted.
 - [Feature] **A bridge: the hall's boards, sent to any number of Alnasl servers.** Started with `config :arkab, role: :bridge`. Every event goes into a SQLite queue on disk first and is numbered, then travels over one outgoing WebSocket per server, TLS when the link is https. Each server has its own cursor, so one that is down holds up nobody else, and an event leaves the queue only once every server has acknowledged it. A bridge that restarts carries on from where the queue says it was, not from where it would like to have been.
 - [Feature] **Commands come back down the same socket.** Rescan a port, add one, forget a port or a board, send a board again in full, and recording on or off. They are applied one at a time in arrival order. Only a server joined as owner can make the bridge forget anything; the others may ask, and will be told no.
