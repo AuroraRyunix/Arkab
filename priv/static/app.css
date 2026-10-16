@@ -27,3 +27,10 @@ li button { margin-left: auto; background: transparent; color: var(--bad); borde
 video { width: 100%; max-width: 24rem; border-radius: 8px; margin-top: .6rem; }
 .ok { color: var(--ok); }
 .error { color: var(--bad); }
+
+ol { padding-left: 1.3rem; margin: .4rem 0 .8rem; }
+li ol, section p { margin: 0 0 .6rem; }
+section ol > li { display: list-item; padding: .2rem 0; }
+.foot { margin-top: 1.5rem; display: flex; gap: .7rem; align-items: center; font-size: .9rem; }
+.foot a { color: var(--fg); }
+.foot a[aria-current=true] { font-weight: 700; text-decoration: none; }
