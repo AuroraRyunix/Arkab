@@ -5,7 +5,7 @@ defmodule ArkabWeb.Layouts do
   def root(assigns) do
     ~H"""
     <!DOCTYPE html>
-    <html lang="en">
+    <html lang={assigns[:locale] || "en"}>
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />

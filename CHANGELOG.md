@@ -15,6 +15,7 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+- [Feature] **A help for the bridge's page, and the page in Dutch.** `/help` says what Arkab is, how to join a server, what the dots mean, what the queue count is, what the ports list shows and what to do when a server is red - six short sections, in English and Dutch. The page itself speaks both now too: EN and NL at the foot, remembered in a cookie, and until you choose, whatever the browser asks for. No gettext for this: about thirty strings do not need a build step to have opinions about them.
 ## [0.1.0] - 2026-10-16
 
 - [Feature] **The board drivers, moved out of Alnasl and renamed `Arkab.*`.** The DGT serial protocol, the single board, the loop and its bus, the emulator, the UART and fake transports, the capture format and its recorder, and the replay player. The code now exists once, here, and Alnasl uses it as a library. Started as a library, Arkab starts nothing at all; it was only moved, not promoted.

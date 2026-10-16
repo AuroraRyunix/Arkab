@@ -6,12 +6,18 @@ defmodule ArkabWeb.Router do
     plug :fetch_session
     plug :fetch_live_flash
     plug :put_root_layout, html: {ArkabWeb.Layouts, :root}
+    plug ArkabWeb.Locale
     plug :protect_from_forgery
     plug :put_secure_browser_headers
   end
 
   scope "/", ArkabWeb do
     pipe_through :browser
-    live "/", StatusLive, :index
+    get "/lang/:code", LangController, :set
+
+    live_session :default, on_mount: {ArkabWeb.Locale, :default} do
+      live "/", StatusLive, :index
+      live "/help", HelpLive, :index
+    end
   end
 end
