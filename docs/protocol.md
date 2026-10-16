@@ -23,7 +23,7 @@ content-type: application/json
 |---|---|
 | `200 {"key", "socket", "server", "owner"}` | joined. `key` is this bridge's long secret for this server. `socket` is the path of the link (`/bridge/link`). `server` is the name to show. `owner` says whether this server may make the bridge forget boards and ports |
 | `404`, `410` | the code is unknown, used up or expired |
-| `400` with `{"error": "version"}` | the server does not speak this version |
+| `409` | the server does not speak this version |
 
 The socket URL keeps the join link's host and port. Its scheme is `ws`
 for a link on `http` and `wss` for one on `https`, so TLS in production
