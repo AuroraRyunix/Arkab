@@ -15,6 +15,8 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-17
+
 - [Change] **Installed copies keep their data in one place that no installer owns:** `%LOCALAPPDATA%\ArkabData`, `/var/lib/arkab`, `~/Library/Application Support/ArkabData`, and `ARKAB_DATA` still wins. The bridge refuses to start with data inside the install folder, the program folder or an app bundle, because an uninstall that takes the queue and the servers' keys with it is a lesson best learnt on somebody else's project. `PORT` is read as well as `ARKAB_PORT`; the installers set the first.
 - [Feature] **A Details panel, the same as the server's.** The Windows launcher and the Mac app can show what the bridge says about itself (version, uptime, CPU, memory, the queue file, servers connected, events waiting, boards, buses open, recording) and the end of its log; `arkab.sh details` does the same in a terminal. The answer is `GET /_launcher/stats`, which is for this machine only, with this start's secret, and 404 for anything else, a proxy header included. No port is opened to answer it.
 - [Feature] **The bridge knows when it is out of date.** An installed copy asks GitHub every half hour, with the last answer's ETag so that "nothing changed" costs nothing, whether a newer version exists, and says so on the status page with the size of the download. It installs nothing without a yes: the Windows installer's launcher or the Linux updater does it, the portable copies get a link. One checkbox switches the question off, and "Later" puts the notice away for a day. The page also says that the boards are not read for about a minute while an update installs, since a bridge, unlike a server, has no idea whether a game is under way and cannot refuse. On Windows there is a switch to start it with the machine.
@@ -22,6 +24,7 @@ tagged so that a version can be skimmed:
 - [Feature] **A mark.** Seven squares, one of them in the accent colour, beside the name on both pages and as the tab icon (`/favicon.svg`), all read from one file, `priv/logo/mark.svg`. Replace the file and the rest follows; it was a name in a heading until now.
 - [Change] The docs now call them what they are to the person using them: live boards.
 - [Feature] **A help for the bridge's page, and the page in Dutch.** `/help` says what Arkab is, how to join a server, what the dots mean, what the queue count is, what the ports list shows and what to do when a server is red - six short sections, in English and Dutch. The page itself speaks both now too: EN and NL at the foot, remembered in a cookie, and until you choose, whatever the browser asks for. No gettext for this: about thirty strings do not need a build step to have opinions about them.
+
 ## [0.1.0] - 2026-10-16
 
 - [Feature] **The board drivers, moved out of Alnasl and renamed `Arkab.*`.** The electronic-board serial protocol, the single board, the loop and its bus, the emulator, the UART and fake transports, the capture format and its recorder, and the replay player. The code now exists once, here, and Alnasl uses it as a library. Started as a library, Arkab starts nothing at all; it was only moved, not promoted.

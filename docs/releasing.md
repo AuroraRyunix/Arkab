@@ -23,12 +23,8 @@ A version without notes publishes nothing (the run says so in a notice and
 stays green); so does a push that changes neither. That second condition is
 the one difference from OpenPairings, where the version alone decides.
 
-**A caution for the very first push of this workflow:** `mix.exs` says
-0.1.0 and `CHANGELOG.md` already has a `## [0.1.0]` section (the version
-Alnasl pins, as the tag `v0.1.0`). If no GitHub *release* of that name
-exists yet, the first green run on `main` publishes it - from whatever
-commit that push is, not from the one the tag points at. Look before
-pushing.
+`v0.1.0` exists only as a tag (the one Alnasl pins as a library) and never
+had a release; the first published release is 0.2.0.
 
 Do not tag by hand. If you do, the tag must be `v` + the version in
 `mix.exs`, or the workflow refuses.
@@ -203,8 +199,7 @@ what holds.
 
 ## Version numbers
 
-`0.1.0` is in `mix.exs` and has never been released, so the first release
-can simply be `0.1.0`: no bump, only the changelog heading. From then on:
+The first published release is `0.2.0`. From then on:
 patch for fixes, minor for anything an arbiter would notice, and 1.0.0 the
 day a whole tournament has been played on real boards through an installed
 copy.
