@@ -1,11 +1,11 @@
 # Arkab
 
-DGT board drivers for Elixir, and a bridge that sends a hall's boards to
+Electronic chessboard drivers for Elixir, and a bridge that sends a hall's boards to
 one or more [Alnasl](https://github.com/AuroraRyunix/Alnasl) servers.
 
 Arkab is used in two ways:
 
-- **As a library.** `Arkab.Driver.DgtSerial`, `Arkab.Driver.DgtBus`, the DGT protocol, loop and bus (`Arkab.Dgt.*`), a board emulator, the UART and fake transports, the capture format (`Arkab.Capture`), its recorder, and the replay player. Alnasl reads its local boards with these. As a dependency, Arkab starts no processes; whoever uses the drivers supervises them (`Arkab.Drivers`).
+- **As a library.** `Arkab.Driver.DgtSerial`, `Arkab.Driver.DgtBus`, the serial protocol, loop and bus (`Arkab.Dgt.*`), a board emulator, the UART and fake transports, the capture format (`Arkab.Capture`), its recorder, and the replay player. Alnasl reads its local boards with these. As a dependency, Arkab starts no processes; whoever uses the drivers supervises them (`Arkab.Drivers`).
 - **As a bridge.** A small program next to the boards, such as a Raspberry Pi in the hall. It reads every board on its ports, writes each event to a queue on disk first, and sends the queue over an outgoing WebSocket to every server it has joined. It never needs an open port facing the internet.
 
 ## The bridge
@@ -62,4 +62,4 @@ real sockets on free local ports.
 ## Licence
 
 Apache-2.0. See [LICENSE](LICENSE) and [NOTICE](NOTICE). Arkab is not
-affiliated with DGT; "DGT" is their trademark.
+affiliated with any board maker.

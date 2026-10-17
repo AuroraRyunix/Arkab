@@ -306,7 +306,8 @@ defmodule Arkab.Driver.DgtBus do
          }}
 
       {:error, reason} ->
-        if state.debug?, do: Logger.info("dgt bus #{state.port}: cannot open: #{inspect(reason)}")
+        if state.debug?,
+          do: Logger.info("board bus #{state.port}: cannot open: #{inspect(reason)}")
 
         for {_address, board} <- state.boards,
             do: Driver.emit(board.owner, board.id, {:info, %{error: inspect(reason)}})
@@ -468,7 +469,7 @@ defmodule Arkab.Driver.DgtBus do
 
   defp received(state, bytes) do
     if state.debug?,
-      do: Logger.info("dgt bus #{state.port} rx #{Base.encode16(bytes, case: :lower)}")
+      do: Logger.info("board bus #{state.port} rx #{Base.encode16(bytes, case: :lower)}")
 
     {answers, rest} = Bus.parse(state.buffer <> bytes)
     state = %{state | buffer: rest} |> still_talking(bytes)
@@ -520,7 +521,7 @@ defmodule Arkab.Driver.DgtBus do
        ) do
     Process.cancel_timer(waiting.timer)
     again(state)
-    if state.debug?, do: Logger.info("dgt bus #{state.port}: a new board answers as #{address}")
+    if state.debug?, do: Logger.info("board bus #{state.port}: a new board answers as #{address}")
     state.stranger.(state.port, address)
     %{state | waiting: nil, strangers: MapSet.put(state.strangers, address)}
   end
@@ -677,7 +678,7 @@ defmodule Arkab.Driver.DgtBus do
 
   defp write(state, frame) do
     if state.debug?,
-      do: Logger.info("dgt bus #{state.port} tx #{Base.encode16(frame, case: :lower)}")
+      do: Logger.info("board bus #{state.port} tx #{Base.encode16(frame, case: :lower)}")
 
     case state.transport.write(state.handle, frame) do
       :ok -> {:ok, state}
@@ -715,7 +716,7 @@ defmodule Arkab.Driver.DgtBus do
   defp drop(%{handle: nil} = state, _reason), do: state
 
   defp drop(state, reason) do
-    if state.debug?, do: Logger.info("dgt bus #{state.port}: lost (#{inspect(reason)})")
+    if state.debug?, do: Logger.info("board bus #{state.port}: lost (#{inspect(reason)})")
     state.transport.close(state.handle)
 
     boards =

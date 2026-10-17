@@ -126,7 +126,7 @@ defmodule Arkab.Driver.DgtSerial do
         end
 
       {:error, reason} ->
-        if state.debug?, do: Logger.info("dgt #{state.port}: cannot open: #{inspect(reason)}")
+        if state.debug?, do: Logger.info("board #{state.port}: cannot open: #{inspect(reason)}")
         Driver.emit(state.owner, state.id, {:info, %{error: inspect(reason)}})
         Process.send_after(self(), :open, state.retry_ms)
         {:noreply, state}
@@ -187,7 +187,9 @@ defmodule Arkab.Driver.DgtSerial do
   # --- bytes in ----------------------------------------------------------------
 
   defp received(state, bytes) do
-    if state.debug?, do: Logger.info("dgt #{state.port} rx #{Base.encode16(bytes, case: :lower)}")
+    if state.debug?,
+      do: Logger.info("board #{state.port} rx #{Base.encode16(bytes, case: :lower)}")
+
     Driver.emit(state.owner, state.id, {:raw, :rx, bytes})
 
     {messages, rest} = Protocol.parse(state.buffer <> bytes)
@@ -259,7 +261,7 @@ defmodule Arkab.Driver.DgtSerial do
     bytes = Protocol.command(command)
 
     if state.debug?,
-      do: Logger.info("dgt #{state.port} tx #{Base.encode16(bytes, case: :lower)} (#{command})")
+      do: Logger.info("board #{state.port} tx #{Base.encode16(bytes, case: :lower)} (#{command})")
 
     Driver.emit(state.owner, state.id, {:raw, :tx, bytes})
 
@@ -276,7 +278,7 @@ defmodule Arkab.Driver.DgtSerial do
 
   defp trace(state, direction, bytes) do
     if state.debug?,
-      do: Logger.info("dgt #{state.port} #{direction} #{Base.encode16(bytes, case: :lower)}")
+      do: Logger.info("board #{state.port} #{direction} #{Base.encode16(bytes, case: :lower)}")
 
     Driver.emit(state.owner, state.id, {:raw, direction, bytes})
   end
@@ -287,7 +289,7 @@ defmodule Arkab.Driver.DgtSerial do
   # the other boards were taken off.
   defp a_loop(state, addresses) do
     if state.debug?,
-      do: Logger.info("dgt #{state.port}: a loop, #{inspect(addresses)} answer")
+      do: Logger.info("board #{state.port}: a loop, #{inspect(addresses)} answer")
 
     state.transport.close(state.handle)
     if state.connected?, do: Driver.emit(state.owner, state.id, :disconnected)
@@ -300,7 +302,7 @@ defmodule Arkab.Driver.DgtSerial do
   defp drop(%{handle: nil} = state, _reason), do: state
 
   defp drop(state, reason) do
-    if state.debug?, do: Logger.info("dgt #{state.port}: lost (#{inspect(reason)})")
+    if state.debug?, do: Logger.info("board #{state.port}: lost (#{inspect(reason)})")
     state.transport.close(state.handle)
     if state.connected?, do: Driver.emit(state.owner, state.id, :disconnected)
     Driver.emit(state.owner, state.id, {:poll, :missed})
