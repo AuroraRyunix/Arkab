@@ -9,6 +9,7 @@ defmodule Arkab.Bridge do
       ├─ Store                      the SQLite file: the queue, the servers, the settings
       ├─ Recorder                   the capture files, while recording is on
       ├─ Arkab.Drivers              the loops' buses (unless something here runs them already)
+      ├─ LauncherDetails, Updates.Checker   (`web: true`) the Details secret; the question whether a newer version is out
       ├─ Boards                     a Bridge.Board per board: its driver, and the queue it feeds
       ├─ Ports                      which ports, which boards; every command from a server
       ├─ Links                      a Bridge.Link per server: the socket, the acks, the commands
@@ -47,6 +48,7 @@ defmodule Arkab.Bridge do
          cap: fn -> Store.get("capture_cap_mb", 500) * 1_000_000 end}
       ] ++
         if(drivers?, do: [Arkab.Drivers], else: []) ++
+        installed(opts) ++
         [
           {DynamicSupervisor, name: Arkab.Bridge.Boards, strategy: :one_for_one},
           {Arkab.Bridge.Ports, Keyword.take(opts, [:sources, :transport])},
@@ -55,6 +57,21 @@ defmodule Arkab.Bridge do
         ] ++ web(opts)
 
     Supervisor.init(children, strategy: :rest_for_one)
+  end
+
+  # What belongs to a copy that is installed and run by somebody: the
+  # launcher's Details secret, and the question to GitHub whether a newer
+  # version is out (`web: true` only: a bridge without its page has nobody
+  # to tell). Tests and libraries start neither.
+  defp installed(opts) do
+    if Keyword.get(opts, :web, false) do
+      [
+        Arkab.LauncherDetails,
+        {Arkab.Updates.Checker, timer: Application.get_env(:arkab, :updates_timer, true)}
+      ]
+    else
+      []
+    end
   end
 
   defp web(opts) do

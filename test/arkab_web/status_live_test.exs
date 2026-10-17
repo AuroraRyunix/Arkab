@@ -44,4 +44,28 @@ defmodule ArkabWeb.StatusLiveTest do
     view |> element("#remove-#{id}") |> render_click()
     assert has_element?(view, "#no-servers")
   end
+
+  test "a newer version is offered, with its size, and Later puts it away" do
+    Arkab.Updates.Checker.put(%{
+      version: "9.9.9",
+      tag: "v9.9.9",
+      url: "https://example.test/releases/tag/v9.9.9",
+      asset: "arkab-linux-x86_64.tar.gz",
+      size: 31_457_280,
+      no_build: false
+    })
+
+    on_exit(fn -> :persistent_term.erase({Arkab.Updates.Checker, :available}) end)
+
+    {:ok, view, _html} = live(build_conn(), "/")
+    assert has_element?(view, "#update")
+    assert render(view) =~ "9.9.9"
+    assert render(view) =~ "30.0 MB"
+    # A copy that is not installed updates by hand: a link, no button.
+    assert has_element?(view, "#update-link")
+    refute has_element?(view, "#update-button")
+
+    view |> element("#update-later") |> render_click()
+    refute has_element?(view, "#update")
+  end
 end

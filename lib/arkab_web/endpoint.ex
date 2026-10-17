@@ -20,6 +20,11 @@ defmodule ArkabWeb.Endpoint do
 
   plug Plug.Static, at: "/", from: :arkab, only: ArkabWeb.static_paths()
 
+  # The launcher's Details panel - this machine, a secret, no proxy header, or
+  # a 404. Before anything that logs, so a panel left open does not fill the
+  # log it shows. See the plug.
+  plug ArkabWeb.Plugs.LauncherStats
+
   plug Plug.RequestId
   plug Plug.Parsers, parsers: [:urlencoded], pass: ["*/*"]
   plug Plug.Head

@@ -11,18 +11,18 @@ defmodule ArkabWeb.Layouts do
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="csrf-token" content={Phoenix.Controller.get_csrf_token()} />
         <title>Arkab</title>
-         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="stylesheet" href="/app.css" />
         <script defer src="/vendor/phoenix.min.js">
         </script>
-        
+
         <script defer src="/vendor/phoenix_live_view.min.js">
         </script>
-        
+
         <script defer src="/app.js">
         </script>
       </head>
-      
+
       <body>
         {@inner_content}
       </body>
