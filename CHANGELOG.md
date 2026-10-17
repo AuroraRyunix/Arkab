@@ -15,6 +15,7 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+- [Feature] **A mark.** Seven squares, one of them in the accent colour, beside the name on both pages and as the tab icon (`/favicon.svg`), all read from one file, `priv/logo/mark.svg`. Replace the file and the rest follows; it was a name in a heading until now.
 - [Change] The docs now call them what they are to the person using them: live boards.
 - [Feature] **A help for the bridge's page, and the page in Dutch.** `/help` says what Arkab is, how to join a server, what the dots mean, what the queue count is, what the ports list shows and what to do when a server is red - six short sections, in English and Dutch. The page itself speaks both now too: EN and NL at the foot, remembered in a cookie, and until you choose, whatever the browser asks for. No gettext for this: about thirty strings do not need a build step to have opinions about them.
 ## [0.1.0] - 2026-10-16

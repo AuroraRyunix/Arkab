@@ -14,6 +14,10 @@ defmodule ArkabWeb.Endpoint do
     from: {:phoenix_live_view, "priv/static"},
     only: ~w(phoenix_live_view.min.js)
 
+  # The favicon is the mark (`ArkabWeb.Logo`), made from priv/logo/mark.svg,
+  # so it is answered here and not read from priv/static.
+  plug :favicon
+
   plug Plug.Static, at: "/", from: :arkab, only: ArkabWeb.static_paths()
 
   plug Plug.RequestId
@@ -21,6 +25,17 @@ defmodule ArkabWeb.Endpoint do
   plug Plug.Head
   plug Plug.Session, @session_options
   plug ArkabWeb.Router
+
+  @doc false
+  def favicon(%Plug.Conn{request_path: "/favicon.svg"} = conn, _opts) do
+    conn
+    |> Plug.Conn.put_resp_content_type("image/svg+xml")
+    |> Plug.Conn.put_resp_header("cache-control", "public, max-age=3600")
+    |> Plug.Conn.send_resp(200, ArkabWeb.Logo.favicon())
+    |> Plug.Conn.halt()
+  end
+
+  def favicon(conn, _opts), do: conn
 
   @doc """
   The page's signing secret: made on the first start and kept in `path`,

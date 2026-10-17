@@ -5,6 +5,19 @@ defmodule ArkabWeb.Components do
 
   alias ArkabWeb.Words
 
+  @doc "The mark (`ArkabWeb.Logo`): decorative, the name beside it says what it is."
+  attr :class, :any, default: nil
+
+  def logo(assigns) do
+    assigns = assign(assigns, :inner, Phoenix.HTML.raw(ArkabWeb.Logo.inner()))
+
+    ~H"""
+    <svg class={["logo", @class]} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      {@inner}
+    </svg>
+    """
+  end
+
   attr :locale, :string, required: true
   attr :page, :atom, values: [:status, :help], required: true
 

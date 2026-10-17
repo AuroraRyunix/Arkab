@@ -7,7 +7,7 @@ defmodule ArkabWeb.StatusLive do
 
   use ArkabWeb, :live_view
 
-  import ArkabWeb.Components, only: [foot: 1]
+  import ArkabWeb.Components, only: [foot: 1, logo: 1]
 
   alias ArkabWeb.Words
 
@@ -77,12 +77,14 @@ defmodule ArkabWeb.StatusLive do
     ~H"""
     <main id="bridge">
       <header>
-        <h1>Arkab <span class="name">{@status.name}</span></h1>
+        <h1><.logo /> Arkab <span class="name">{@status.name}</span></h1>
+        
         <p class="note">{Words.t(@locale, :tagline)}</p>
       </header>
-
+      
       <section id="servers">
         <h2>{Words.t(@locale, :servers)}</h2>
+        
         <ul :if={@status.servers != []} id="server-list">
           <li :for={server <- @status.servers} id={"server-#{server.id}"}>
             <span
@@ -93,8 +95,7 @@ defmodule ArkabWeb.StatusLive do
                   else: Words.t(@locale, :not_connected)
                 )
               }
-            ></span>
-            <span class="server-name">{server.name}</span>
+            ></span> <span class="server-name">{server.name}</span>
             <span :if={!server.up? && server.error} class="note">{server.error}</span>
             <button
               id={"remove-#{server.id}"}
@@ -107,14 +108,17 @@ defmodule ArkabWeb.StatusLive do
             </button>
           </li>
         </ul>
+        
         <p :if={@status.servers == []} class="note" id="no-servers">
           {Words.t(@locale, :no_servers)}
         </p>
+        
         <p id="waiting">{Words.t(@locale, :waiting)} <strong>{@status.waiting}</strong></p>
       </section>
-
+      
       <section id="join">
         <h2>{Words.t(@locale, :join_title)}</h2>
+        
         <form id="join-form" phx-submit="join">
           <input
             id="join-link"
@@ -126,30 +130,32 @@ defmodule ArkabWeb.StatusLive do
           <button id="join-button" type="submit" disabled={@joining?}>
             {if @joining?, do: Words.t(@locale, :joining), else: Words.t(@locale, :join)}
           </button>
+          
           <button id="scan-button" type="button" phx-hook="Scan" hidden>
             {Words.t(@locale, :scan)}
           </button>
         </form>
-        <video id="scan-video" phx-update="ignore" hidden playsinline></video>
+         <video id="scan-video" phx-update="ignore" hidden playsinline></video>
         <p :if={@message} id="join-message" class={elem(@message, 0)}>{elem(@message, 1)}</p>
+        
         <p class="note">{Words.t(@locale, :join_hint)}</p>
       </section>
-
+      
       <section id="ports">
         <h2>{Words.t(@locale, :ports_title)}</h2>
+        
         <p :if={@status.ports == []} class="note">{Words.t(@locale, :no_ports)}</p>
+        
         <ul id="port-list">
           <li :for={port <- @status.ports} id={"port-#{port.port}"}>
-            <span class="mono">{port.port}</span>
-            <span class="note">{port.description}</span>
+            <span class="mono">{port.port}</span> <span class="note">{port.description}</span>
             <span :if={!port.read?} class="note">{Words.t(@locale, :not_read)}</span>
             <ul>
               <li
                 :for={board <- Enum.filter(@status.boards, &(&1.port == port.port))}
                 id={"board-#{board.id}"}
               >
-                <span class={["dot", if(board.connected?, do: "up", else: "down")]}></span>
-                {if board.address,
+                <span class={["dot", if(board.connected?, do: "up", else: "down")]}></span> {if board.address,
                   do: Words.t(@locale, :board_no, n: board.address),
                   else: Words.t(@locale, :board)}
                 <span :if={board.info[:serial]} class="mono">
@@ -159,14 +165,14 @@ defmodule ArkabWeb.StatusLive do
             </ul>
           </li>
         </ul>
+        
         <p class="note">
           {Words.t(@locale, :recording)} {if @status.recording?,
             do: Words.t(@locale, :on),
             else: Words.t(@locale, :off)}
         </p>
       </section>
-
-      <.foot locale={@locale} page={:status} />
+       <.foot locale={@locale} page={:status} />
     </main>
     """
   end
