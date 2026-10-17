@@ -8,6 +8,44 @@ Arkab is used in two ways:
 - **As a library.** `Arkab.Driver.DgtSerial`, `Arkab.Driver.DgtBus`, the serial protocol, loop and bus (`Arkab.Dgt.*`), a board emulator, the UART and fake transports, the capture format (`Arkab.Capture`), its recorder, and the replay player. Alnasl reads its local boards with these. As a dependency, Arkab starts no processes; whoever uses the drivers supervises them (`Arkab.Drivers`).
 - **As a bridge.** A small program next to the boards, such as a Raspberry Pi in the hall. It reads every board on its ports, writes each event to a queue on disk first, and sends the queue over an outgoing WebSocket to every server it has joined. It never needs an open port facing the internet.
 
+## Install
+
+Every push to `main` builds all of these; a release attaches them. The
+addresses are the same for every release.
+
+| What | Download |
+|---|---|
+| Windows installer (one click, updates itself) | [Arkab-Setup.exe](https://github.com/AuroraRyunix/Arkab/releases/latest/download/Arkab-Setup.exe) |
+| Windows, no install | [arkab-windows-x86_64-portable.zip](https://github.com/AuroraRyunix/Arkab/releases/latest/download/arkab-windows-x86_64-portable.zip) |
+| Linux, Raspberry Pi (64-bit) and other arm64 | [arkab-linux-aarch64.tar.gz](https://github.com/AuroraRyunix/Arkab/releases/latest/download/arkab-linux-aarch64.tar.gz) |
+| Linux, PC | [arkab-linux-x86_64.tar.gz](https://github.com/AuroraRyunix/Arkab/releases/latest/download/arkab-linux-x86_64.tar.gz) |
+| Mac, Apple Silicon (macOS 11 and newer) | [arkab-macos-aarch64.zip](https://github.com/AuroraRyunix/Arkab/releases/latest/download/arkab-macos-aarch64.zip) |
+| Checksums | [SHA256SUMS](https://github.com/AuroraRyunix/Arkab/releases/latest/download/SHA256SUMS) |
+
+**Linux and the Raspberry Pi**, one line, as a service that starts with the
+machine (Debian 12, Ubuntu 22.04, Raspberry Pi OS "Bookworm" 64-bit, or
+newer; the runtime is inside):
+
+```sh
+curl -fsSL https://github.com/AuroraRyunix/Arkab/releases/latest/download/install.sh | sudo sh
+```
+
+(`--local` keeps the page to the box itself.) The program lives in
+`/opt/arkab`, the data in `/var/lib/arkab`, and neither an update nor
+`/opt/arkab/uninstall.sh` touches the data. Its log is
+`journalctl -u arkab`.
+
+**Windows**: Windows says it does not know the program, as it does of any
+unsigned installer: "More info", then "Run anyway". The data is in
+`%LOCALAPPDATA%\ArkabData`, never in the install folder. **macOS**: open
+`Arkab.app` the first time with *Open Anyway* in System Settings; see
+[docs/macos.md](docs/macos.md).
+
+An installed copy looks for a newer release now and then (one small request
+to GitHub, switched off by a checkbox on the status page) and offers it; it
+installs nothing without a yes. How releases are cut and what each file is:
+[docs/releasing.md](docs/releasing.md).
+
 ## The bridge
 
 ```sh
@@ -22,8 +60,8 @@ board belongs to.
 
 | variable | |
 |---|---|
-| `ARKAB_DATA` | where the queue, the servers, the settings and the captures live (default `./data`) |
-| `ARKAB_PORT` | the status page's port (default 4050) |
+| `ARKAB_DATA` | where the queue, the servers, the settings and the captures live (default `./data` from a checkout; an installed copy keeps it where `Arkab.DataHome` says, never inside the install folder) |
+| `ARKAB_PORT` | the status page's port (default 4050; `PORT` is read too, as the installers set it) |
 | `ARKAB_LISTEN=local` | serve the page to this machine only |
 | `ARKAB_UART=0` / `1` | build without or with the serial library (default: with it, except on Windows where it has to be asked for). When it is not set, `ALNASL_UART` decides, so a server built with `ALNASL_UART=0` builds Arkab without it too |
 
