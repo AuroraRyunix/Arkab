@@ -18,4 +18,11 @@ config :logger, :default_formatter, format: "$time [$level] $message\n"
 
 config :phoenix, :json_library, Jason
 
+# The macOS release job compiles the SQLite library from source rather than
+# fetching the precompiled one: that wants macOS 14, and the app promises 11.
+# rel/macos/build_app.sh checks the result.
+if System.get_env("EXQLITE_FORCE_BUILD") == "true" do
+  config :exqlite, force_build: true
+end
+
 import_config "#{config_env()}.exs"

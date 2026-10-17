@@ -18,3 +18,7 @@ config :arkab,
   loop_reply_ms: 80,
   loop_gap_ms: 5,
   loop_discover_ms: 400
+
+# No launcher secret, no file in the data directory, no question to GitHub:
+# the tests that want them start them themselves.
+config :arkab, launcher_details: false, updates_timer: false
