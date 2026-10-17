@@ -169,7 +169,7 @@ main() {
     else
         say "               and http://<this box's address>:4050 from the hall's network."
     fi
-    say "  Next:        open the page and paste the join link of your Alnasl server.
+    say "  Next:        open the page and paste the join link of your Alnasl server."
     say "  The data:    $DATA_DIR"
     say "  The program: $INSTALL_DIR"
     say "  Its log:     journalctl -u arkab"
