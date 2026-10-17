@@ -100,12 +100,12 @@ defmodule ArkabWeb.HelpLive do
 
       <section id="help-update">
         <h2>Een nieuwere versie</h2>
-        
+
         <p>
           Een geïnstalleerde brug kijkt af en toe op GitHub of er een nieuwere versie is en meldt dat bovenaan de pagina, met de grootte van de download. Er wordt niets geïnstalleerd zonder dat jij op "Downloaden en installeren" drukt. Tijdens het installeren, ongeveer een minuut, worden de borden niet gelezen: kies dus een moment tussen de rondes. Een portable kopie krijgt een link in plaats van een knop. Onder "Dit programma" kun je het kijken uitzetten.
         </p>
       </section>
-      
+
       <section id="help-red">
         <h2>Als een server rood is</h2>
 
@@ -211,12 +211,12 @@ defmodule ArkabWeb.HelpLive do
 
       <section id="help-update">
         <h2>A newer version</h2>
-        
+
         <p>
           An installed bridge now and then looks on GitHub for a newer version and says so at the top of the page, with the size of the download. Nothing is installed until you press "Download and install". While it installs, about a minute, the boards are not read, so pick a moment between rounds. A portable copy gets a link instead of a button. Under "This program" you can switch the looking off.
         </p>
       </section>
-      
+
       <section id="help-red">
         <h2>When a server shows red</h2>
 
