@@ -21,14 +21,14 @@ not host copies, and do not print a version number you did not fetch.
 
 | What | Address |
 |---|---|
-| Windows installer | `https://github.com/AuroraRyunix/Arkab/releases/latest/download/Arkab-Setup.exe` |
-| Windows, portable zip | `https://github.com/AuroraRyunix/Arkab/releases/latest/download/arkab-windows-x86_64-portable.zip` |
-| Linux, PC (x86_64) | `https://github.com/AuroraRyunix/Arkab/releases/latest/download/arkab-linux-x86_64.tar.gz` |
-| Linux, Raspberry Pi and other arm64 | `https://github.com/AuroraRyunix/Arkab/releases/latest/download/arkab-linux-aarch64.tar.gz` |
-| Linux installer script | `https://github.com/AuroraRyunix/Arkab/releases/latest/download/install.sh` |
-| Mac, Apple Silicon only | `https://github.com/AuroraRyunix/Arkab/releases/latest/download/arkab-macos-aarch64.zip` |
-| Checksums | `https://github.com/AuroraRyunix/Arkab/releases/latest/download/SHA256SUMS` |
-| All versions, release notes | `https://github.com/AuroraRyunix/Arkab/releases` |
+| Windows installer | `https://github.com/teapot-chess/Arkab/releases/latest/download/Arkab-Setup.exe` |
+| Windows, portable zip | `https://github.com/teapot-chess/Arkab/releases/latest/download/arkab-windows-x86_64-portable.zip` |
+| Linux, PC (x86_64) | `https://github.com/teapot-chess/Arkab/releases/latest/download/arkab-linux-x86_64.tar.gz` |
+| Linux, Raspberry Pi and other arm64 | `https://github.com/teapot-chess/Arkab/releases/latest/download/arkab-linux-aarch64.tar.gz` |
+| Linux installer script | `https://github.com/teapot-chess/Arkab/releases/latest/download/install.sh` |
+| Mac, Apple Silicon only | `https://github.com/teapot-chess/Arkab/releases/latest/download/arkab-macos-aarch64.zip` |
+| Checksums | `https://github.com/teapot-chess/Arkab/releases/latest/download/SHA256SUMS` |
+| All versions, release notes | `https://github.com/teapot-chess/Arkab/releases` |
 
 ## Instructions, three lines each
 

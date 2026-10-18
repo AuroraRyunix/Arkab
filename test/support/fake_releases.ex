@@ -50,7 +50,7 @@ defmodule Arkab.FakeReleases do
 
     release = %{
       "tag_name" => tag,
-      "html_url" => "https://github.com/AuroraRyunix/Arkab/releases/tag/#{tag}",
+      "html_url" => "https://github.com/teapot-chess/Arkab/releases/tag/#{tag}",
       "draft" => Keyword.get(opts, :draft, false),
       "prerelease" => Keyword.get(opts, :prerelease, false),
       "assets" => Enum.map(sizes, fn {name, size} -> %{"name" => name, "size" => size} end)

@@ -35,7 +35,7 @@ with a higher number; installed copies move forward only.
 ## What a release holds
 
 All names are without a version, so that
-`https://github.com/AuroraRyunix/Arkab/releases/latest/download/<name>`
+`https://github.com/teapot-chess/Arkab/releases/latest/download/<name>`
 is a link that stays right. The version is inside each file.
 
 | File | What it is | Who asks for it by name |

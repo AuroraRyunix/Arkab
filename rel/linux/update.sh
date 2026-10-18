@@ -25,7 +25,7 @@
 
 set -eu
 
-REPO="AuroraRyunix/Arkab"
+REPO="teapot-chess/Arkab"
 INSTALL_DIR="/opt/arkab"
 DATA_DIR="/var/lib/arkab"
 CONF_FILE="/etc/arkab/arkab.env"

@@ -5,7 +5,7 @@
 
 [Unit]
 Description=Arkab - the bridge for live boards
-Documentation=https://github.com/AuroraRyunix/Arkab
+Documentation=https://github.com/teapot-chess/Arkab
 After=network.target
 
 [Service]

@@ -115,7 +115,7 @@
 #define DEFAULT_PORT 4050
 #define MAXP 1024
 
-#define REPO_URL "https://github.com/AuroraRyunix/Arkab"
+#define REPO_URL "https://github.com/teapot-chess/Arkab"
 #define RUN_KEY L"Software\\Microsoft\\Windows\\CurrentVersion\\Run"
 #define RUN_VALUE L"Arkab"
 

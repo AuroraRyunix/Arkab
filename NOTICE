@@ -5,7 +5,7 @@ This product is licensed under the Apache License, Version 2.0 (see LICENSE).
 
 The board drivers, the DGT serial protocol, the loop and bus code, the
 board emulator, the transports and the capture format came from Alnasl
-(https://github.com/AuroraRyunix/Alnasl), by the same author and under the
+(https://github.com/teapot-chess/Alnasl), by the same author and under the
 same licence. They were moved here so the code exists once: Alnasl now uses
 them from this package. Changes: the module names (Alnasl.* -> Arkab.*) and
 the application environment (:alnasl -> :arkab).

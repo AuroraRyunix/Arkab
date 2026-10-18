@@ -48,7 +48,7 @@ defmodule Arkab.Updates do
   alias Arkab.Bridge.Store
   alias Arkab.Updates.Checker
 
-  @repo "AuroraRyunix/Arkab"
+  @repo "teapot-chess/Arkab"
   @latest_url "https://api.github.com/repos/#{@repo}/releases/latest"
   @releases_page "https://github.com/#{@repo}/releases"
   @user_agent "Arkab-UpdateCheck"

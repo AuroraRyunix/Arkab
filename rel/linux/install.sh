@@ -2,7 +2,7 @@
 # Installs Arkab, the bridge for live boards, on a Linux box - a small PC or
 # a Raspberry Pi in the hall - as a service that starts with the machine.
 #
-#   curl -fsSL https://github.com/AuroraRyunix/Arkab/releases/latest/download/install.sh | sudo sh
+#   curl -fsSL https://github.com/teapot-chess/Arkab/releases/latest/download/install.sh | sudo sh
 #
 # or, in a hall without internet, from a release unpacked on a stick:
 #
@@ -33,7 +33,7 @@
 
 set -eu
 
-REPO="AuroraRyunix/Arkab"
+REPO="teapot-chess/Arkab"
 INSTALL_DIR="/opt/arkab"
 DATA_DIR="/var/lib/arkab"
 CONF_DIR="/etc/arkab"
