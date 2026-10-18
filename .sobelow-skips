@@ -1,0 +1,25 @@
+CI.System: Command Injection via `System` function,lib/arkab/autostart.ex:68,18D70AF
+Config.CSP: Missing Content-Security-Policy,lib/arkab_web/router.ex:11,53D17C4
+Config.HTTPS: HTTPS Not Enabled,config/prod.exs:0,2B5C077
+Traversal.FileModule: Directory Traversal in `File.chmod`,lib/arkab/launcher_details.ex:155,55344D6
+Traversal.FileModule: Directory Traversal in `File.chmod`,lib/arkab/launcher_details.ex:160,781955B
+Traversal.FileModule: Directory Traversal in `File.mkdir_p!`,lib/arkab/bridge.ex:33,44B9B9
+Traversal.FileModule: Directory Traversal in `File.mkdir_p!`,lib/arkab/bridge/store.ex:116,312873B
+Traversal.FileModule: Directory Traversal in `File.mkdir_p!`,lib/arkab/recorder.ex:123,765B589
+Traversal.FileModule: Directory Traversal in `File.mkdir_p`,lib/arkab/launcher_details.ex:154,51A0DA1
+Traversal.FileModule: Directory Traversal in `File.mkdir_p`,lib/arkab/updates.ex:327,364DB68
+Traversal.FileModule: Directory Traversal in `File.open`,lib/arkab/launcher_details/cli.ex:223,384B8B1
+Traversal.FileModule: Directory Traversal in `File.open`,lib/arkab/recorder.ex:126,5540A3C
+Traversal.FileModule: Directory Traversal in `File.read`,lib/arkab/capture.ex:63,2940F15
+Traversal.FileModule: Directory Traversal in `File.read`,lib/arkab/launcher_details/cli.ex:265,4413F15
+Traversal.FileModule: Directory Traversal in `File.read`,lib/arkab/updates.ex:348,361EEF4
+Traversal.FileModule: Directory Traversal in `File.read`,lib/arkab_web/endpoint.ex:54,4AA23CD
+Traversal.FileModule: Directory Traversal in `File.rm`,lib/arkab/launcher_details.ex:131,588A32
+Traversal.FileModule: Directory Traversal in `File.rm`,lib/arkab/recorder.ex:149,2FEA606
+Traversal.FileModule: Directory Traversal in `File.write!`,lib/arkab_web/endpoint.ex:60,48E03D4
+Traversal.FileModule: Directory Traversal in `File.write`,lib/arkab/launcher_details.ex:159,7944FD6
+Traversal.FileModule: Directory Traversal in `File.write`,lib/arkab/launcher_details.ex:161,6C7610
+Traversal.FileModule: Directory Traversal in `File.write`,lib/arkab/updates.ex:328,69FCADD
+XSS.Raw: XSS,lib/arkab/driver/dgt_bus.ex:507,73FDBDB
+XSS.Raw: XSS,lib/arkab_web/components.ex:12,4FEAC9B
+XSS.SendResp: XSS in `send_resp`,lib/arkab_web/endpoint.ex:39,48DDA9E
