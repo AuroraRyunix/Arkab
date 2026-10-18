@@ -43,7 +43,7 @@ defmodule ArkabWeb.HelpLive do
 
         <ol>
           <li>
-            Open op de server de pagina van de zaal en druk op "Een brug toevoegen". Er verschijnt een link met een QR-code, goed voor één brug en vijftien minuten.
+            Open in Alnasl Zalen, dan je zaal, dan het tabblad Bruggen, en druk op "Een brug toevoegen". (De Installatiewizard van Alnasl, het eerste onderdeel van Instellingen, leidt er ook heen.) Er verschijnt een link met een QR-code, goed voor één brug en vijftien minuten.
           </li>
 
           <li>
@@ -156,7 +156,7 @@ defmodule ArkabWeb.HelpLive do
 
         <ol>
           <li>
-            On the server, open the hall's page and press "Add a bridge". A link appears with a QR code, good for one bridge and fifteen minutes.
+            In Alnasl, open Halls, then your hall, then its Bridges tab, and press "Add a bridge". (Alnasl's Setup wizard, the first section of Setup, leads there too.) A link appears with a QR code, good for one bridge and fifteen minutes.
           </li>
 
           <li>
