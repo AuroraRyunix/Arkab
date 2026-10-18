@@ -25,6 +25,12 @@ defmodule ArkabWeb.StatusLiveTest do
     assert Supervisor.which_children(Arkab.Supervisor) == []
   end
 
+  test "the join field says where in Alnasl the link comes from" do
+    {:ok, view, _html} = live(build_conn(), "/")
+    assert has_element?(view, "#join .note", "Halls, your hall, Bridges")
+    assert has_element?(view, "#join .note", "Add a bridge")
+  end
+
   test "the page joins a server from a pasted link, and removes it again" do
     server = FakeServer.start(codes: ["P"])
     {:ok, view, _html} = live(build_conn(), "/")

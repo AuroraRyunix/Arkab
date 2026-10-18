@@ -28,7 +28,7 @@ defmodule ArkabWeb.Words do
       scan: "Scan",
       joined: "Joined.",
       join_hint:
-        "On the server: Halls, Add a bridge. Paste or scan the link it shows; that is all.",
+        "In Alnasl: Halls, your hall, Bridges, \"Add a bridge\". Paste the link it shows here, or press Scan and point the camera at its code; that is all.",
       ports_title: "Ports and boards",
       no_ports: "No ports.",
       not_read: "(not read)",
@@ -81,7 +81,7 @@ defmodule ArkabWeb.Words do
       scan: "Scannen",
       joined: "Aangesloten.",
       join_hint:
-        "Op de server: Zalen, Een brug toevoegen. Plak of scan de link die verschijnt; meer is het niet.",
+        "In Alnasl: Zalen, je zaal, Bruggen, \"Een brug toevoegen\". Plak de link die verschijnt hier, of druk op Scannen en richt de camera op de code; meer is het niet.",
       ports_title: "Poorten en borden",
       no_ports: "Geen poorten.",
       not_read: "(wordt niet gelezen)",

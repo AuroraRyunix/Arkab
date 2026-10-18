@@ -15,6 +15,8 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+- [Change] **The page says where the join link comes from, in Alnasl's own words:** Halls, your hall, Bridges, "Add a bridge", then paste it here or scan its code. The help says the same, and that Alnasl's Setup wizard leads there too. "On the server: Halls" had been accurate in the way a street name without a town is.
+
 ## [0.2.0] - 2026-10-17
 
 - [Change] **Installed copies keep their data in one place that no installer owns:** `%LOCALAPPDATA%\ArkabData`, `/var/lib/arkab`, `~/Library/Application Support/ArkabData`, and `ARKAB_DATA` still wins. The bridge refuses to start with data inside the install folder, the program folder or an app bundle, because an uninstall that takes the queue and the servers' keys with it is a lesson best learnt on somebody else's project. `PORT` is read as well as `ARKAB_PORT`; the installers set the first.
