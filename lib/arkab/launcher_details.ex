@@ -129,7 +129,15 @@ defmodule Arkab.LauncherDetails do
   @impl true
   def terminate(_reason, %{local?: true} = state) do
     if state.token_file, do: File.rm(state.token_file)
-    Application.delete_env(:arkab, :launcher_token)
+    # At shutdown the application controller is busy stopping us and will
+    # not take calls; asking it anyway only buys an error in the log on the
+    # way out. The env goes with the node regardless.
+    try do
+      Application.delete_env(:arkab, :launcher_token)
+    catch
+      :exit, _busy -> :ok
+    end
+
     :ok
   end
 
