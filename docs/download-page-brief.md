@@ -35,7 +35,7 @@ not host copies, and do not print a version number you did not fetch.
 **Windows**: download `Arkab-Setup.exe` and run it (Windows warns that it
 does not know the program: "More info", then "Run anyway"); leave the small
 window open, closing it stops the bridge; open the page it shows on port
-4050 and paste the join link of your Alnasl server.
+4050 and paste the join link from Alnasl (Halls, your hall, Bridges, *Add a bridge*).
 
 **Raspberry Pi and Linux**: run the one-line installer from the README;
 open `http://<the box>:4050`; paste the join link.

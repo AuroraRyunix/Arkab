@@ -53,10 +53,12 @@ mix deps.get
 mix run --no-halt          # or: iex -S mix
 ```
 
-Open `http://<bridge>:4050`. Paste or scan the join link that the
-server's Setup page shows under *Add a bridge*. That is the whole setup:
-the bridge fetches its own key, and the server decides which table each
-board belongs to.
+Open `http://<bridge>:4050`. Paste or scan the join link that Alnasl shows:
+Halls, your hall, Bridges, *Add a bridge* (Alnasl's Setup wizard leads
+there too). The link is good for fifteen minutes and one bridge. That is the
+whole setup: the bridge fetches its own key, and the server decides which
+table each board belongs to. The page speaks English and Dutch, the choice
+kept in a cookie; `/help` says what the page's parts mean.
 
 | variable | |
 |---|---|
