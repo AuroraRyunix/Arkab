@@ -15,6 +15,8 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-10-18
+
 - [Fix] Quitting no longer leaves an error in the log about the launcher's details. It was tidying up a setting while the application controller was busy shutting everything down, and complaining when nobody answered.
 - [Change] **The page says where the join link comes from, in Alnasl's own words:** Halls, your hall, Bridges, "Add a bridge", then paste it here or scan its code. The help says the same, and that Alnasl's Setup wizard leads there too. "On the server: Halls" had been accurate in the way a street name without a town is.
 
