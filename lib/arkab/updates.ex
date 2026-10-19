@@ -202,10 +202,8 @@ defmodule Arkab.Updates do
   # Velopack may fetch a smaller delta instead; the full package is the
   # honest upper bound.
   defp asset_for(assets, version) when is_list(assets) do
-    case asset_name(install_kind(), version) do
-      nil -> nil
-      name -> Enum.find(assets, &(is_map(&1) and &1["name"] == name and is_integer(&1["size"])))
-    end
+    name = asset_name(install_kind(), version)
+    Enum.find(assets, &(is_map(&1) and &1["name"] == name and is_integer(&1["size"])))
   end
 
   defp asset_for(_none, _version), do: nil
@@ -218,23 +216,61 @@ defmodule Arkab.Updates do
   @doc false
   # The system as an argument, so that a test on one can ask about another.
   def asset_name(_kind, _version, {:win32, _}), do: "arkab-windows-x86_64-portable.zip"
-  # Intel Macs have no build: `nil` names no file, so no link to a missing one.
-  def asset_name(_kind, _version, {:unix, :darwin}) do
-    if arch() == "aarch64", do: "arkab-macos-aarch64.zip"
-  end
-
+  def asset_name(_kind, _version, {:unix, :darwin}), do: "arkab-macos-#{arch()}.zip"
   def asset_name(_kind, _version, _unix), do: "arkab-linux-#{arch()}.tar.gz"
 
-  @doc "True on an Intel Mac, for which no build is made."
-  def no_build?(os), do: os == {:unix, :darwin} and arch() == "x86_64"
+  @doc """
+  True when no build exists for this system, so that the notice says so
+  rather than link a file that is not there. Every system Arkab runs on has
+  one since the Intel Mac build (`arkab-macos-x86_64.zip`, made for releases
+  only); the question stays, because the notice still asks it.
+  """
+  def no_build?(_os), do: false
 
-  @doc "`x86_64` or `aarch64`, as the release assets are named."
+  @doc """
+  `x86_64` or `aarch64`, as the release assets are named: the machine's, not
+  the program's. An x86_64 Arkab under Rosetta on an Apple Silicon Mac is on
+  an `aarch64` machine and wants the arm64 build, which runs natively.
+  """
   def arch do
-    architecture = to_string(:erlang.system_info(:system_architecture))
+    case :persistent_term.get({__MODULE__, :arch}, nil) do
+      nil ->
+        found = arch(to_string(:erlang.system_info(:system_architecture)), translated?())
+        :persistent_term.put({__MODULE__, :arch}, found)
+        found
 
+      found ->
+        found
+    end
+  end
+
+  @doc "The machine's architecture, from the Erlang one and whether Rosetta is translating this program."
+  def arch(system_architecture, translated?) do
     cond do
-      String.starts_with?(architecture, ["aarch64", "arm64"]) -> "aarch64"
+      String.starts_with?(system_architecture, ["aarch64", "arm64"]) -> "aarch64"
+      translated? -> "aarch64"
       true -> "x86_64"
+    end
+  end
+
+  # `sysctl.proc_translated` is 1 for a program Rosetta runs, 0 for a native
+  # one, and absent (an error) on an Intel Mac and before Rosetta 2.
+  defp translated? do
+    case :os.type() do
+      {:unix, :darwin} ->
+        try do
+          match?(
+            {"1" <> _, 0},
+            System.cmd("/usr/sbin/sysctl", ["-n", "sysctl.proc_translated"],
+              stderr_to_stdout: true
+            )
+          )
+        rescue
+          _ -> false
+        end
+
+      _other ->
+        false
     end
   end
 

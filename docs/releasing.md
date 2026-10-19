@@ -45,6 +45,7 @@ is a link that stays right. The version is inside each file.
 | `arkab-linux-x86_64.tar.gz` | The Linux release, PCs | `install.sh`, `update.sh`, the download page |
 | `arkab-linux-aarch64.tar.gz` | The Linux release, 64-bit Raspberry Pi and other arm64 | the same |
 | `arkab-macos-aarch64.zip` | `Arkab.app` for Apple Silicon (M1 and later), zipped with `ditto` | the download page; a Mac copy's update notice (its size) |
+| `arkab-macos-x86_64.zip` | `Arkab.app` for Intel Macs (macOS 10.13 and newer), built only for a release | the same, on an Intel Mac |
 | `install.sh` | The one-line installer | `curl ... \| sudo sh` |
 | `update.sh`, `uninstall.sh` | Copies of what the archive carries, for reading | nobody; a person |
 | `SHA256SUMS` | Checksums of everything above and below | `install.sh`, `update.sh` |

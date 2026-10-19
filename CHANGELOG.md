@@ -15,6 +15,8 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+- [Feature] **Arkab for Intel Macs, from macOS 10.13.** macOS 10 exists only on Intel Macs, and they had been struck off on the 14th because their build is slow. It is back, and it is built only when there is a release to put it in (or when somebody starts the workflow by hand), so the other pushes are as quick as they were. Arkab's own update notice picks the zip for the Mac it is on, and no longer says an Intel Mac has no build; an Intel Arkab running under Rosetta on an Apple Silicon Mac is treated as the Apple Silicon Mac it is. Every program in the bundle, serial library included, is checked against the oldest macOS promised, as before. Whether a 2017 Mac and an electronic board agree is for a person with both to say; see docs/macos.md.
+
 ## [0.3.3] - 2026-10-19
 
 - [Change] **"Did not answer" now says what it heard instead.** A board on a loop that missed a question was logged as silent whether it was silent or not. The line now adds either "nothing came back" or how many bytes did, how soon, whether they failed their checksum, and the bytes themselves. A mute board and a port that mangles a talkative one no longer look the same in the log.

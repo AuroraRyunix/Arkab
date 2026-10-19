@@ -20,6 +20,7 @@ addresses are the same for every release.
 | Linux, Raspberry Pi (64-bit) and other arm64 | [arkab-linux-aarch64.tar.gz](https://github.com/teapot-chess/Arkab/releases/latest/download/arkab-linux-aarch64.tar.gz) |
 | Linux, PC | [arkab-linux-x86_64.tar.gz](https://github.com/teapot-chess/Arkab/releases/latest/download/arkab-linux-x86_64.tar.gz) |
 | Mac, Apple Silicon (macOS 11 and newer) | [arkab-macos-aarch64.zip](https://github.com/teapot-chess/Arkab/releases/latest/download/arkab-macos-aarch64.zip) |
+| Mac, Intel (macOS 10.13 and newer) | [arkab-macos-x86_64.zip](https://github.com/teapot-chess/Arkab/releases/latest/download/arkab-macos-x86_64.zip) |
 | Checksums | [SHA256SUMS](https://github.com/teapot-chess/Arkab/releases/latest/download/SHA256SUMS) |
 
 **Linux and the Raspberry Pi**, one line, as a service that starts with the

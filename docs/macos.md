@@ -1,25 +1,74 @@
 # Arkab on macOS
 
 Since 2026-10-14 every push to `main` builds **`Arkab.app`** for Apple
-Silicon Macs, and a release attaches it. Nobody on the project has a Mac:
+Silicon Macs, and a release attaches it, together with a build for **Intel
+Macs** (from macOS 10.13; built only for a release, see
+[Intel Macs](#intel-macs)). Nobody on the project has a Mac:
 everything here was built and started on GitHub's macOS runners, and the
 [test list](#testing-a-build-on-a-real-mac) at the end is what a person
 with a Mac (and ideally an electronic board) still has to confirm.
 
 | | |
 |---|---|
-| Apple Silicon only (M1 and later) | `arkab-macos-aarch64.zip`, built on `macos-15` |
+| Apple Silicon (M1 and later) | `arkab-macos-aarch64.zip`, built on `macos-15` |
+| Intel | `arkab-macos-x86_64.zip`, built on `macos-15-intel`, only for a release or a hand-started run |
 | Runtime | Erlang/OTP 29.0.5 compiled on the runner by `rel/macos/build_otp.sh`, for macOS 11, with OpenSSL 3.5 compiled the same way and linked into `crypto` statically; Elixir 1.20 from its own precompiled zip. Cached, so only the first run with a given set of versions pays. Linux and Windows use `erlef/setup-beam`; on macOS that would be `erlef/otp_builds`, which is built for macOS 15 and made the app refuse to open on 14 (see [Why the runtime is built here](#why-the-runtime-is-built-here)) |
 | Serial library | `circuits_uart`, compiled on the runner (`ARKAB_UART=1`, on by default on any Unix); the build stops if it is missing |
-| Oldest macOS | 11 (Big Sur). Everything compiled on the runner is built for it (`MACOSX_DEPLOYMENT_TARGET=11.0`, the SQLite NIF from source with `EXQLITE_FORCE_BUILD`), and `build_app.sh` fails the build, naming the files, if any binary asks for newer; what they accept goes into `Info.plist` |
+| Oldest macOS | Apple Silicon: 11 (Big Sur); Intel: 10.13 (High Sierra), see [Intel Macs](#intel-macs). Everything compiled on the runner is built for it (`MACOSX_DEPLOYMENT_TARGET` is 11.0, or the Intel target's `macos_min` in the workflow; the SQLite NIF from source with `EXQLITE_FORCE_BUILD`), and `build_app.sh` fails the build, naming the files, if any binary asks for newer; what they accept goes into `Info.plist` |
 | Signed | ad-hoc only, for now - see [Unsigned, for now](#unsigned-for-now) |
+
+## Intel Macs
+
+macOS 10 exists only on Intel Macs, so the Intel build is also the one that
+reaches back. It is `arkab-macos-x86_64.zip`, compiled on GitHub's Intel
+runner (`macos-15-intel`; a real Intel machine, nothing is cross-compiled)
+with `MACOSX_DEPLOYMENT_TARGET=10.13`, which `build_otp.sh` and
+`build_app.sh` read like the Apple Silicon build reads 11.0. The SQLite NIF
+and the serial program are compiled the same way.
+
+It is built **only when a release is published** (a version bump on `main`
+with its changelog section) **or when the workflow is started by hand**
+(*Actions > Build and release > Run workflow*), never on an ordinary push or
+pull request: the Intel runner is slow, which is why Intel was dropped on
+2026-10-14. The `plan` job in `release.yml` decides, from the release's own
+two conditions, and adds the Intel target to the build matrix when it
+should run. A release that cannot build for Intel is not published. A
+hand-started run on a branch builds everything and publishes nothing: the
+`release` job runs only on `main` or a tag.
+
+Arkab's update notice picks the zip that matches the Mac it is on
+(`Arkab.Updates.arch/0`): an Intel Mac gets `arkab-macos-x86_64.zip`, an
+Apple Silicon Mac `arkab-macos-aarch64.zip`, and an Intel Arkab running under
+Rosetta on an Apple Silicon Mac still counts as Apple Silicon
+(`sysctl.proc_translated`). `Arkab.Updates.no_build?/1`, which used to say
+"there is no build for this machine" on an Intel Mac, is now false everywhere.
+
+### How far back
+
+10.13 (High Sierra) is where the Intel build stops. The proof is in the
+smoke test's log: it lists the `minos` of every Mach-O file in the bundle
+(`vtool -show-build`) and `LSMinimumSystemVersion` in `Info.plist`, which the
+test also compares with the target; `build_app.sh` fails the build, naming
+the files, if any asks for more. The launcher is Swift, and macOS before
+10.14.4 has no Swift runtime, so the libraries it uses are copied into
+`Contents/Frameworks` by `swift-stdlib-tool` and found through an `@rpath`.
+A few Foundation and AppKit calls it made are 10.14 or 10.15 and newer
+(`scrollableTextView()`, `FileHandle.seekToEnd()` and relatives,
+`monospacedSystemFont`); `Launcher.swift` asks `#available` and uses the
+older call on 10.13.
+
+**Not tested on a real Mac running 10.13.** The runner is macOS 15. What CI
+proves is that nothing in the bundle asks for more than 10.13 and that the
+app starts and answers on a current macOS. Whether 10.13 runs it, and
+whether a serial adapter works there, is for the
+[test list](#testing-a-build-on-a-real-mac), on a Mac that old.
 
 ## What the app is
 
 ```
 Arkab.app/Contents/
   Info.plist              rel/macos/Info.plist, version from the release's VERSION
-  MacOS/Arkab            rel/macos/Launcher.swift, compiled (arm64, macOS 11+)
+  MacOS/Arkab            rel/macos/Launcher.swift, compiled (arm64, macOS 11+; x86_64, macOS 10.13+)
   Resources/launcher.sh   rel/macos/launcher.sh
   Resources/app/          the release (bin/arkab), whole
   Resources/Arkab.icns   from rel/macos/Arkab-icon.png
