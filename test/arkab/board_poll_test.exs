@@ -32,7 +32,10 @@ defmodule Arkab.BoardPollTest do
 
   defp say(pid, event), do: send(pid, {:driver, "COM3#6310", event})
 
-  defp polls(store) do
+  # The board first: what it was told is still in its mailbox otherwise, and
+  # the store is asked before anything reached it.
+  defp polls(pid, store) do
+    _ = :sys.get_state(pid)
     Store.sync(store)
 
     for %{"e" => %{"k" => "poll"} = e} <- Store.pending(store, 0, 1_000),
@@ -43,7 +46,7 @@ defmodule Arkab.BoardPollTest do
     for _ <- 1..60, do: say(pid, {:poll, :ok})
     say(pid, {:poll, :missed})
     # The first answer went at once, the other fifty-nine are owed.
-    assert polls(store) == [{"ok", nil}, {"ok", 59}, {"missed", nil}]
+    assert polls(pid, store) == [{"ok", nil}, {"ok", 59}, {"missed", nil}]
   end
 
   test "misses travel one by one, and the first answer after them is one answer", %{
@@ -56,7 +59,7 @@ defmodule Arkab.BoardPollTest do
     say(pid, {:poll, :ok})
     say(pid, {:poll, :missed})
 
-    assert polls(store) ==
+    assert polls(pid, store) ==
              [{"missed", nil}, {"missed", nil}, {"ok", nil}, {"ok", nil}, {"missed", nil}]
   end
 
@@ -65,6 +68,6 @@ defmodule Arkab.BoardPollTest do
     say(pid, :connected)
     :ok = Board.resend("COM3#6310")
     say(pid, {:poll, :missed})
-    assert polls(store) == [{"ok", nil}, {"ok", 9}, {"missed", nil}]
+    assert polls(pid, store) == [{"ok", nil}, {"ok", 9}, {"missed", nil}]
   end
 end
