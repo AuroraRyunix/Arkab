@@ -15,6 +15,8 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+- [Change] **"Did not answer" now says what it heard instead.** A board on a loop that missed a question was logged as silent whether it was silent or not. The line now adds either "nothing came back" or how many bytes did, how soon, whether they failed their checksum, and the bytes themselves. A mute board and a port that mangles a talkative one no longer look the same in the log.
+
 ## [0.3.2] - 2026-10-19
 
 - [Fix] **A bridged board's "Signal" is no longer a percentage of the wrong thing.** The bridge sends one "answered" a second and every miss, so a loop board polled sixty times a second showed 95% with nine misses, and one that missed a handful per second showed 17%. The answer that is sent now says how many answers it stands for (`n` on the wire; a server that ignores it sees what it saw before), and the answers owed go out ahead of the next miss.
