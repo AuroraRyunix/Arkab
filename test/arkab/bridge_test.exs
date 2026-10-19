@@ -143,6 +143,34 @@ defmodule Arkab.BridgeTest do
     assert seqs == Enum.to_list(hd(seqs)..List.last(seqs))
   end
 
+  test "an old and a new board on one adapter are two rows, before and after a rescan", %{
+    dir: dir
+  } do
+    boards = [
+      Emulator.new(address: 6310, serial: "06310", version: "1.9", bus?: true),
+      Emulator.new(address: 12_799, serial: "00730", version: "4.0", bus?: true)
+    ]
+
+    start_supervised!({Fake, port: "FAKE-BR2", device: {Emulator, boards}})
+    start_bridge(dir, [%{"port" => "FAKE-BR2"}])
+
+    ids = fn -> Bridge.status().boards |> Enum.map(& &1.id) |> Enum.sort() end
+    both = ["FAKE-BR2#12799", "FAKE-BR2#6310"]
+
+    eventually(fn -> ids.() == both end, 15_000)
+
+    # Read again: the loop is found again, nothing is left of the first
+    # reading and no third row (the single-board one) turns up.
+    :ok = Arkab.Bridge.Ports.command(%{"cmd" => "rescan"}, true)
+    eventually(fn -> ids.() == both end, 15_000)
+    eventually(fn -> Enum.all?(Bridge.status().boards, & &1.connected?) end, 15_000)
+    assert ids.() == both
+
+    old = Enum.find(Bridge.status().boards, &(&1.id == "FAKE-BR2#6310"))
+    assert old.info.serial == "06310"
+    assert old.address == 6310
+  end
+
   test "an emulated board on a serial line: read, named, sent, and sent again on request",
        %{dir: dir} do
     start_supervised!({Fake, port: "FAKE-BR1", device: {Emulator, Emulator.new()}})

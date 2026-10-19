@@ -4,7 +4,8 @@ defmodule Arkab.Transport.Fake do
   it the way a device would.
 
   The device is `{module, state}` with `module.handle(state, bytes)` returning
-  `{reply_bytes, state}` - in practice `Arkab.Dgt.Emulator`, a DGT board in
+  `{reply_bytes, state}` (or `{{:after, ms, bytes}, state}` for a slow one, a list of those for
+  several) - in practice `Arkab.Dgt.Emulator`, a DGT board in
   software. `update/2` changes the device from outside (a piece is moved) and
   sends whatever the device then says unasked; `unplug/1` and `replug/1` pull
   the cable. Port names start with `FAKE`.
@@ -120,8 +121,15 @@ defmodule Arkab.Transport.Fake do
 
   def handle_call(:replug, _from, s), do: {:reply, :ok, %{s | plugged?: true}}
 
-  defp deliver(%{owner: owner}, bytes) when is_pid(owner) and byte_size(bytes) > 0,
-    do: send(owner, {:arkab_fake, bytes})
+  # A device that answers late says `{:after, ms, bytes}`, several at once a list.
+  defp deliver(s, list) when is_list(list), do: Enum.each(list, &deliver(s, &1))
+
+  defp deliver(%{owner: owner}, {:after, ms, bytes}) when is_pid(owner) and byte_size(bytes) > 0,
+    do: Process.send_after(owner, {:arkab_fake, bytes}, ms)
+
+  defp deliver(%{owner: owner}, bytes)
+       when is_pid(owner) and is_binary(bytes) and byte_size(bytes) > 0,
+       do: send(owner, {:arkab_fake, bytes})
 
   defp deliver(_s, _bytes), do: :ok
 end

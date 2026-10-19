@@ -12,8 +12,12 @@ defmodule Arkab.Bridge.Board do
   - **"answered"** (`{:poll, :ok}`) travels once a second, and always the
     first one after a miss. A loop answers sixty times a second; the
     server wants to know the line is alive and when a run of misses ended,
-    not every heartbeat. Every miss travels: a run of them is what makes
-    the tracker stop believing the clock.
+    not every heartbeat. The one that travels says how many answers it
+    stands for (`{:poll, :ok, n}`), and the ones owed go out before the
+    next miss, so that the server can still tell a board that answers
+    ninety-nine times in a hundred from one that answers once in six.
+    Every miss travels, one by one: a run of them is what makes the
+    tracker stop believing the clock.
 
   It also remembers the board as it stands - connected or not, what it said
   about itself, the position, the clock - for "send the whole board again"
@@ -89,7 +93,9 @@ defmodule Arkab.Bridge.Board do
       clock: nil,
       # The last {t, speed, next} of a played board: what "now" is for it.
       played: nil,
-      poll: nil
+      poll: nil,
+      # Answers heard since the last one that was sent.
+      owed: 0
     }
 
     {:ok, start_driver(state)}
@@ -178,22 +184,30 @@ defmodule Arkab.Bridge.Board do
     state
   end
 
-  defp take(state, {:poll, :ok} = event, t, at) do
+  # Answers that are not sent are still counted: the one that goes carries
+  # how many it stands for (`{:poll, :ok, n}`, "n" on the wire), so that the
+  # server's "answered / missed" is not a percentage of one per second
+  # against every miss.
+  defp take(state, {:poll, :ok}, t, at) do
     now = System.monotonic_time(:millisecond)
+    owed = state.owed + 1
 
     case state.poll do
       {:ok, last} when now - last < @poll_every_ms ->
-        state
+        %{state | owed: owed}
 
       _missed_or_first ->
-        queue(state, t, at, event)
-        %{state | poll: {:ok, now}}
+        queue(state, t, at, answered(owed))
+        %{state | poll: {:ok, now}, owed: 0}
     end
   end
 
+  # The answers not yet sent go first, so that a run of misses is not
+  # counted against answers that were still in the bridge.
   defp take(state, {:poll, :missed} = event, t, at) do
+    if state.owed > 0, do: queue(state, t, at, answered(state.owed))
     queue(state, t, at, event)
-    %{state | poll: :missed}
+    %{state | poll: :missed, owed: 0}
   end
 
   defp take(state, event, t, at) do
@@ -201,6 +215,9 @@ defmodule Arkab.Bridge.Board do
     queue(state, t, at, event)
     remember(state, event)
   end
+
+  defp answered(1), do: {:poll, :ok}
+  defp answered(n), do: {:poll, :ok, n}
 
   defp remember(state, {:position, board}), do: %{state | position: board}
   defp remember(state, {:clock, reading}), do: %{state | clock: reading}
