@@ -535,7 +535,7 @@ defmodule Arkab.Driver.DgtBus do
       board =
         state.boards[address]
         |> answered()
-        |> raw(waiting, message)
+        |> into_capture(waiting, message)
         |> take(kind, message, address, t, state)
 
       put_in(state.boards[address], board)
@@ -619,11 +619,11 @@ defmodule Arkab.Driver.DgtBus do
 
   # The bytes go into the capture when they said something: sixty "nothing
   # changed" a second would bury the rest.
-  defp raw(board, %{kind: kind}, message)
+  defp into_capture(board, %{kind: kind}, message)
        when kind == :ignore or (kind == :changes and message == {:changes, <<>>}),
        do: board
 
-  defp raw(board, waiting, _message) do
+  defp into_capture(board, waiting, _message) do
     Driver.emit(board.owner, board.id, {:raw, :tx, waiting.tx})
     Driver.emit(board.owner, board.id, {:raw, :rx, waiting.rx})
     board
