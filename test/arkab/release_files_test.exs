@@ -54,7 +54,7 @@ defmodule Arkab.ReleaseFilesTest do
       # release must hold, on the download page's brief and in the README.
       for name <- ~w(Arkab-Setup.exe arkab-windows-x86_64-portable.zip
                      arkab-linux-x86_64.tar.gz arkab-linux-aarch64.tar.gz install.sh
-                     arkab-macos-aarch64.zip) do
+                     arkab-macos-aarch64.zip arkab-macos-x86_64.zip) do
         assert workflow =~ name, "release.yml does not publish #{name}"
         assert brief =~ "releases/latest/download/#{name}", "the brief does not link #{name}"
       end
@@ -68,14 +68,17 @@ defmodule Arkab.ReleaseFilesTest do
 
     test "the Linux archives are built where a Raspberry Pi can run them" do
       workflow = read(".github/workflows/release.yml")
-      assert workflow =~ "runner: ubuntu-22.04, target: linux-x86_64"
-      assert workflow =~ "runner: ubuntu-22.04-arm, target: linux-aarch64"
+      assert workflow =~ ~s("runner":"ubuntu-22.04","target":"linux-x86_64")
+      assert workflow =~ ~s("runner":"ubuntu-22.04-arm","target":"linux-aarch64")
     end
 
     test "the Mac app is built on the Macs whose names the release gives it" do
       workflow = read(".github/workflows/release.yml")
-      assert workflow =~ "runner: macos-15, target: macos-aarch64"
-      refute workflow =~ "macos-15-intel"
+      assert workflow =~ ~s("runner":"macos-15","target":"macos-aarch64","macos_min":"11.0")
+      # The Intel build is made for a release or a hand-started run, never
+      # for an ordinary push: the plan job adds it.
+      assert workflow =~ ~s("runner":"macos-15-intel","target":"macos-x86_64","macos_min":"10.13")
+      assert workflow =~ ~s(if [ "$PUBLISH" = true ] || [ "$EVENT" = workflow_dispatch ])
       assert workflow =~ ~s(dist/arkab-${{ matrix.target }}.zip)
       # Signing is there, and cannot run without its secret.
       assert workflow =~ "if: runner.os == 'macOS' && steps.apple.outputs.sign == 'true'"
@@ -85,7 +88,7 @@ defmodule Arkab.ReleaseFilesTest do
   end
 
   describe "the Mac runtime" do
-    test "is built for macOS 11, and a build that is not fails" do
+    test "is built for the target's oldest macOS, and a build that is not fails" do
       workflow = read(".github/workflows/release.yml")
       build_otp = read("rel/macos/build_otp.sh")
       build_app = read("rel/macos/build_app.sh")
@@ -93,7 +96,10 @@ defmodule Arkab.ReleaseFilesTest do
       # The ready-made Erlang for macOS said "15.0"; it is not used there.
       assert workflow =~ "if: runner.os != 'macOS'"
       assert workflow =~ ~s(sh rel/macos/build_otp.sh "$HOME/otp-macos")
-      assert workflow =~ ~s(echo "MACOSX_DEPLOYMENT_TARGET=11.0" >> "$GITHUB_ENV")
+
+      assert workflow =~
+               ~s(echo "MACOSX_DEPLOYMENT_TARGET=${{ matrix.macos_min }}" >> "$GITHUB_ENV")
+
       assert workflow =~ "steps.otp-cache.outputs.cache-hit != 'true'"
 
       assert [_, otp_key] = Regex.run(~r/path: ~\/otp-macos\n\s+key: (.+)$/m, workflow)
@@ -123,8 +129,12 @@ defmodule Arkab.ReleaseFilesTest do
       assert read("config/config.exs") =~ "config :exqlite, force_build: true"
       assert Regex.match?(~r/_build\/prod\/lib\n\s+key:.*env\.MACOSX_DEPLOYMENT_TARGET/, workflow)
 
-      # A binary that wants newer than macOS 11 fails the build, by name.
-      assert build_app =~ "supported=11.0"
+      # A binary that wants newer than the target fails the build, by name;
+      # the target defaults to the Apple Silicon one, and the Intel build
+      # copies the Swift runtime into the app because 10.13 has none.
+      assert build_app =~ "supported=${MACOSX_DEPLOYMENT_TARGET:-11.0}"
+      assert build_app =~ "swift-stdlib-tool"
+      assert build_otp =~ "darwin64-x86_64-cc"
       assert build_app =~ ~s(newer "$minos" "$supported")
       assert build_app =~ ~s(sed 's/^/  /' "$too_new")
     end
@@ -217,7 +227,7 @@ defmodule Arkab.ReleaseFilesTest do
       build = read("rel/macos/build_app.sh")
       assert plist =~ ~r{<key>CFBundleExecutable</key>\s*<string>Arkab</string>}
       assert build =~ ~s(-o "$app/Contents/MacOS/Arkab" "$swift_source")
-      assert build =~ "-target arm64-apple-macos11"
+      assert build =~ ~s(-target "$swift_arch-apple-macos$supported")
       assert build =~ ~s(cp "$here/launcher.sh" "$app/Contents/Resources/launcher.sh")
       assert build =~ "logo=rel/macos/Arkab-icon.png"
     end

@@ -15,7 +15,10 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-10-19
+
 - [Fix] **A join refused because the bridge is in another hall says so.** Alnasl turns away a link from a second hall while the bridge still sits in the first, and says exactly that. Arkab heard a 403 and announced that the address "answered, but not like a server", which was true of every server it had ever met. It now says the bridge has to be removed from the other hall first.
+- [Feature] **Arkab for Intel Macs, from macOS 10.13.** macOS 10 exists only on Intel Macs, and they had been struck off on the 14th because their build is slow. It is back, and it is built only when there is a release to put it in (or when somebody starts the workflow by hand), so the other pushes are as quick as they were. Arkab's own update notice picks the zip for the Mac it is on, and no longer says an Intel Mac has no build; an Intel Arkab running under Rosetta on an Apple Silicon Mac is treated as the Apple Silicon Mac it is. Every program in the bundle, serial library included, is checked against the oldest macOS promised, as before. Whether a 2017 Mac and an electronic board agree is for a person with both to say; see docs/macos.md.
 
 ## [0.3.3] - 2026-10-19
 

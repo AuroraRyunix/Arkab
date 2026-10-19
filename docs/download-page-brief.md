@@ -26,7 +26,8 @@ not host copies, and do not print a version number you did not fetch.
 | Linux, PC (x86_64) | `https://github.com/teapot-chess/Arkab/releases/latest/download/arkab-linux-x86_64.tar.gz` |
 | Linux, Raspberry Pi and other arm64 | `https://github.com/teapot-chess/Arkab/releases/latest/download/arkab-linux-aarch64.tar.gz` |
 | Linux installer script | `https://github.com/teapot-chess/Arkab/releases/latest/download/install.sh` |
-| Mac, Apple Silicon only | `https://github.com/teapot-chess/Arkab/releases/latest/download/arkab-macos-aarch64.zip` |
+| Mac, Apple Silicon (macOS 11 and newer) | `https://github.com/teapot-chess/Arkab/releases/latest/download/arkab-macos-aarch64.zip` |
+| Mac, Intel (macOS 10.13 and newer) | `https://github.com/teapot-chess/Arkab/releases/latest/download/arkab-macos-x86_64.zip` |
 | Checksums | `https://github.com/teapot-chess/Arkab/releases/latest/download/SHA256SUMS` |
 | All versions, release notes | `https://github.com/teapot-chess/Arkab/releases` |
 

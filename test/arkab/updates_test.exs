@@ -51,7 +51,7 @@ defmodule Arkab.UpdatesTest do
 
       # A copy that is not installed fetches the archive of its system.
       assert info.asset == Updates.asset_name(:manual, newer())
-      assert info.size in [52_000_000, 31_000_000, 30_000_000, 29_000_000]
+      assert info.size in [52_000_000, 31_000_000, 30_000_000, 29_000_000, 30_500_000]
     end
 
     test "each system asks for the download of its own, by the name the release gives it" do
@@ -62,15 +62,21 @@ defmodule Arkab.UpdatesTest do
                ~r/^arkab-linux-(x86_64|aarch64)\.tar\.gz$/
     end
 
-    test "an Intel Mac is told there is no build, not sent to a file that does not exist" do
-      assert Updates.no_build?({:unix, :darwin}) == (Updates.arch() == "x86_64")
+    test "a Mac gets the zip of its own architecture, and no Mac is told there is no build" do
+      name = Updates.asset_name(:manual, newer(), {:unix, :darwin})
+      assert name == "arkab-macos-#{Updates.arch()}.zip"
+      assert name in ["arkab-macos-aarch64.zip", "arkab-macos-x86_64.zip"]
+
+      refute Updates.no_build?({:unix, :darwin})
       refute Updates.no_build?({:unix, :linux})
       refute Updates.no_build?({:win32, :nt})
+    end
 
-      # The name must be nil exactly when the notice says "no build".
-      name = Updates.asset_name(:manual, newer(), {:unix, :darwin})
-      assert is_nil(name) == Updates.no_build?({:unix, :darwin})
-      assert name in [nil, "arkab-macos-aarch64.zip"]
+    test "Rosetta counts as the Apple Silicon Mac it is" do
+      assert Updates.arch("aarch64-apple-darwin24.0.0", false) == "aarch64"
+      assert Updates.arch("arm64-apple-darwin24.0.0", false) == "aarch64"
+      assert Updates.arch("x86_64-apple-darwin24.0.0", false) == "x86_64"
+      assert Updates.arch("x86_64-apple-darwin24.0.0", true) == "aarch64"
     end
 
     test "the Windows installation is told the size of the full package" do
