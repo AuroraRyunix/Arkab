@@ -15,6 +15,9 @@ defmodule ArkabWeb.Words do
   @words %{
     "en" => %{
       tagline: "Reads the boards in this hall and sends them on.",
+      read_only_title: "Read-only view",
+      read_only:
+        "You are looking at this bridge from another computer, so you can see everything and change nothing. To join or leave a server, or to update, open this page on the bridge itself, or from your own computer through an SSH port forward (ssh -L 4050:localhost:4050 <the bridge>, then http://localhost:4050).",
       servers: "Servers",
       connected: "connected",
       not_connected: "not connected",
@@ -22,6 +25,9 @@ defmodule ArkabWeb.Words do
       confirm_remove: "Leave this server? It stops getting these boards.",
       no_servers: "Joined to no server yet.",
       waiting: "Events waiting:",
+      store_dropped:
+        "%{n} events were thrown away because the queue could not be kept (a full disk, or a server that never came back). Remove servers that are gone, and look at the disk.",
+      store_error: "The disk refused the last write: %{why}",
       join_title: "Join a server",
       join: "Join",
       joining: "Joining...",
@@ -68,6 +74,9 @@ defmodule ArkabWeb.Words do
     },
     "nl" => %{
       tagline: "Leest de borden in deze zaal en stuurt ze door.",
+      read_only_title: "Alleen-lezen weergave",
+      read_only:
+        "Je kijkt vanaf een andere computer naar deze brug: je ziet alles, maar kunt niets wijzigen. Om aan te sluiten bij een server, een server te verlaten of bij te werken open je deze pagina op de brug zelf, of vanaf je eigen computer via een SSH-poortdoorverwijzing (ssh -L 4050:localhost:4050 <de brug>, daarna http://localhost:4050).",
       servers: "Servers",
       connected: "verbonden",
       not_connected: "niet verbonden",
@@ -75,6 +84,9 @@ defmodule ArkabWeb.Words do
       confirm_remove: "Deze server verlaten? Hij krijgt deze borden dan niet meer.",
       no_servers: "Nog bij geen enkele server aangesloten.",
       waiting: "Gebeurtenissen in de wachtrij:",
+      store_dropped:
+        "%{n} gebeurtenissen zijn weggegooid omdat de wachtrij niet bewaard kon blijven (een volle schijf, of een server die nooit meer terugkwam). Verwijder servers die weg zijn, en kijk naar de schijf.",
+      store_error: "De schijf weigerde het laatste schrijven: %{why}",
       join_title: "Aansluiten bij een server",
       join: "Aansluiten",
       joining: "Aansluiten...",

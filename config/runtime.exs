@@ -32,6 +32,18 @@ end
 if config_env() != :test do
   port = System.get_env("ARKAB_PORT") || System.get_env("PORT") || "4050"
 
+  # `ArkabWeb.HostGuard` adds this machine's names and addresses to the hosts
+  # it answers to only when the page is open to the hall's network. A bridge
+  # reached by a DNS name (the router's, a reverse proxy's) lists it in
+  # ARKAB_HOSTS, comma-separated.
+  config :arkab,
+    listen: if(System.get_env("ARKAB_LISTEN") == "local", do: :local, else: :lan),
+    extra_hosts:
+      "ARKAB_HOSTS"
+      |> System.get_env("")
+      |> String.split(",", trim: true)
+      |> Enum.map(&String.trim/1)
+
   config :arkab, ArkabWeb.Endpoint,
     http: [
       ip: if(System.get_env("ARKAB_LISTEN") == "local", do: {127, 0, 0, 1}, else: {0, 0, 0, 0}),

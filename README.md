@@ -53,11 +53,17 @@ mix deps.get
 mix run --no-halt          # or: iex -S mix
 ```
 
-Open `http://<bridge>:4050`. Paste or scan the join link that Alnasl shows:
+Open `http://localhost:4050` on the bridge (or, from another computer, through
+an SSH port forward: `ssh -L 4050:localhost:4050 user@bridge`). Paste or scan the join link that Alnasl shows:
 Halls, your hall, Bridges, *Add a bridge* (Alnasl's Setup wizard leads
 there too). The link is good for fifteen minutes and one bridge. That is the
 whole setup: the bridge fetches its own key, and the server decides which
-table each board belongs to. The page speaks English and Dutch, the choice
+table each board belongs to. The page is open to the hall's network for
+looking, but from another computer it is a read-only view (servers, queue,
+ports, boards), marked as such: joining, removing a server, updating and the
+settings work from the bridge itself only (the peer address of the connection
+decides, never a header; an SSH port forward counts as the bridge itself). A
+request that asks for a host the bridge does not answer to gets a 403. The page speaks English and Dutch, the choice
 kept in a cookie; `/help` says what the page's parts mean.
 
 | variable | |
@@ -65,6 +71,7 @@ kept in a cookie; `/help` says what the page's parts mean.
 | `ARKAB_DATA` | where the queue, the servers, the settings and the captures live (default `./data` from a checkout; an installed copy keeps it where `Arkab.DataHome` says, never inside the install folder) |
 | `ARKAB_PORT` | the status page's port (default 4050; `PORT` is read too, as the installers set it) |
 | `ARKAB_LISTEN=local` | serve the page to this machine only |
+| `ARKAB_HOSTS` | extra host names the page answers to, comma-separated (a DNS name the hall's router gives the bridge); the machine's own name and addresses are always accepted unless `ARKAB_LISTEN=local` |
 | `ARKAB_UART=0` / `1` | build without or with the serial library (default: with it, except on Windows where it has to be asked for). When it is not set, `ALNASL_UART` decides, so a server built with `ALNASL_UART=0` builds Arkab without it too |
 
 What the bridge promises:

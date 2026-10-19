@@ -3,6 +3,8 @@ import Config
 # The tests start the bridge's pieces themselves, each with a directory of
 # its own; nothing starts with the application.
 config :arkab, role: :library
+# Phoenix's test connections ask for this host.
+config :arkab, extra_hosts: ["www.example.com"]
 config :arkab, data_dir: Path.expand("../tmp/test", __DIR__)
 
 config :arkab, ArkabWeb.Endpoint,

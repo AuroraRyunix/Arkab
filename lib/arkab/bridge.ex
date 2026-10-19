@@ -165,7 +165,8 @@ defmodule Arkab.Bridge do
     Map.merge(ports, %{
       name: name(),
       servers: servers,
-      waiting: Store.waiting()
+      waiting: Store.waiting(),
+      store: Store.health()
     })
   end
 

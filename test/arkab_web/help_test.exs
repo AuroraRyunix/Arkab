@@ -31,7 +31,8 @@ defmodule ArkabWeb.HelpTest do
     {:ok, view, html} = live(build_conn(), "/help")
     assert html =~ ~s(lang="en")
 
-    for id <- ~w(help-what help-join help-servers help-queue help-ports help-update help-red) do
+    for id <-
+          ~w(help-what help-join help-remote help-servers help-queue help-ports help-update help-red) do
       assert has_element?(view, "##{id}")
     end
 
@@ -43,7 +44,8 @@ defmodule ArkabWeb.HelpTest do
     assert html =~ ~s(lang="nl")
     assert has_element?(view, "#help-join", "Aansluiten bij een server")
 
-    for id <- ~w(help-what help-join help-servers help-queue help-ports help-update help-red) do
+    for id <-
+          ~w(help-what help-join help-remote help-servers help-queue help-ports help-update help-red) do
       assert has_element?(view, "##{id}")
     end
   end
