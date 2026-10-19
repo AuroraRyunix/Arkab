@@ -15,6 +15,8 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-10-19
+
 - [Fix] **Stopping Arkab stops Arkab, promptly.** With the status page open in a browser (which is to say, always), the server politely waited fifteen seconds for the page to hang up before it would go, then closed its database, and the Mac launcher's patience ran out at twenty. "Stopping Arkab..." sat there long enough to look like a hang. Open pages now get three seconds, as Polis and Nunki already gave them, and the Mac launcher writes into the log how long a stop took, or that it had to insist.
 
 ## [0.3.0] - 2026-10-19
