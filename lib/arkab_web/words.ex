@@ -51,6 +51,8 @@ defmodule ArkabWeb.Words do
       err_used_or_expired: "That link is used up or expired. Ask the server for a new one.",
       err_unreachable: "The server in that link does not answer from here.",
       err_version: "That server speaks another version of the link. Update one of the two.",
+      err_elsewhere:
+        "This bridge is still in another hall on that server. Remove it there first, then use the link again.",
       err_other: "That address answered, but not like a server.",
       update_available: "Arkab %{version} is out.",
       update_size: "The download is %{mb} MB.",
@@ -111,6 +113,8 @@ defmodule ArkabWeb.Words do
       err_used_or_expired: "Die link is al gebruikt of verlopen. Vraag de server om een nieuwe.",
       err_unreachable: "De server in die link antwoordt niet vanaf hier.",
       err_version: "Die server spreekt een andere versie van de link. Werk een van de twee bij.",
+      err_elsewhere:
+        "Deze brug zit nog in een andere zaal op die server. Haal hem daar eerst weg en gebruik de link dan opnieuw.",
       err_other: "Dat adres antwoordde, maar niet als een server.",
       update_available: "Arkab %{version} is uit.",
       update_size: "De download is %{mb} MB.",

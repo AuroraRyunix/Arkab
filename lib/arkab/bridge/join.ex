@@ -52,6 +52,11 @@ defmodule Arkab.Bridge.Join do
         {:ok, %{status: 409}} ->
           {:error, :version}
 
+        # This bridge is still in another hall on that server, which will
+        # not let a code from a second hall take it away from the first.
+        {:ok, %{status: 403, body: %{"error" => "elsewhere"}}} ->
+          {:error, :elsewhere}
+
         {:ok, _other} ->
           {:error, :not_a_server}
 

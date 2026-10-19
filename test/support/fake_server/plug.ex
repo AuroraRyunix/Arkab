@@ -12,11 +12,17 @@ defmodule Arkab.FakeServer.Plug do
 
     reply =
       Agent.get_and_update(agent, fn state ->
-        if MapSet.member?(state.codes, code) do
-          {{:ok, state.key, state.owner},
-           %{state | codes: MapSet.delete(state.codes, code)} |> Map.put(:bridge, identity)}
-        else
-          {:gone, state}
+        cond do
+          # A code of another hall, for a bridge still in this one.
+          code == "ELS-WHR" ->
+            {:elsewhere, state}
+
+          MapSet.member?(state.codes, code) ->
+            {{:ok, state.key, state.owner},
+             %{state | codes: MapSet.delete(state.codes, code)} |> Map.put(:bridge, identity)}
+
+          true ->
+            {:gone, state}
         end
       end)
 
@@ -33,6 +39,11 @@ defmodule Arkab.FakeServer.Plug do
             "owner" => owner
           })
         )
+
+      :elsewhere ->
+        conn
+        |> put_resp_content_type("application/json")
+        |> send_resp(403, Jason.encode!(%{"error" => "elsewhere"}))
 
       :gone ->
         send_resp(conn, 410, "gone")
