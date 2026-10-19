@@ -15,6 +15,8 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-10-19
+
 - [Change] **"Did not answer" now says what it heard instead.** A board on a loop that missed a question was logged as silent whether it was silent or not. The line now adds either "nothing came back" or how many bytes did, how soon, whether they failed their checksum, and the bytes themselves. A mute board and a port that mangles a talkative one no longer look the same in the log.
 
 ## [0.3.2] - 2026-10-19
