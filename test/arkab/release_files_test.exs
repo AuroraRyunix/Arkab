@@ -291,4 +291,43 @@ defmodule Arkab.ReleaseFilesTest do
       end
     end
   end
+
+  describe "the Linux updater (rel/linux/update.sh)" do
+    # `newer` is a plain function at the top of the script (the rest is in
+    # main(), which must not run here), so it is cut out and run on its own.
+    defp newer?(a, b) do
+      script = read("rel/linux/update.sh")
+      [function] = Regex.run(~r/^newer\(\) \{\n.*?\n\}\n/ms, script)
+
+      {_out, status} =
+        System.cmd("sh", ["-c", function <> ~s(\nnewer "$1" "$2"\n), "sh", a, b],
+          stderr_to_stdout: true
+        )
+
+      status == 0
+    end
+
+    @tag :shell
+    test "a requested version must be newer, number by number" do
+      assert newer?("0.10.0", "0.9.0")
+      assert newer?("1.0.0", "0.99.99")
+      assert newer?("0.3.1", "0.3.0")
+      refute newer?("0.3.0", "0.3.0")
+      refute newer?("0.2.9", "0.3.0")
+      refute newer?("0.9.0", "0.10.0")
+    end
+
+    test "a request for an older or equal version never reaches the download" do
+      script = read("rel/linux/update.sh")
+      [requested_block] = Regex.run(~r/if \[ "\$requested" = 1 \]; then.*?\n    fi\n/s, script)
+
+      # The refusal comes before anything is fetched, and a missing installed
+      # version is a refusal too.
+      assert requested_block =~ "newer \"$wanted\" \"$current\""
+      assert requested_block =~ ~s([ -z "$current" ])
+      assert requested_block =~ "refused"
+      refute requested_block =~ "curl"
+      assert :binary.match(script, requested_block) < :binary.match(script, "curl -fsSL")
+    end
+  end
 end

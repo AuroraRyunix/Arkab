@@ -3,6 +3,12 @@ defmodule ArkabWeb.StatusLive do
   The bridge's page. Read once a second, because what it shows - a line up
   or down, events waiting - changes on its own. In English or Dutch
   (`ArkabWeb.Words`); the help is `ArkabWeb.HelpLive`.
+
+  Anyone on the hall's network may look; only the machine itself may touch
+  (`ArkabWeb.Local`). The peer is read from the socket when the page mounts
+  (`local?`), and every event that changes something is refused for a visitor
+  who is not local, whatever the page drew: a button that is not drawn is
+  still an event anybody can send.
   """
 
   use ArkabWeb, :live_view
@@ -10,7 +16,10 @@ defmodule ArkabWeb.StatusLive do
   import ArkabWeb.Components, only: [foot: 1, logo: 1]
 
   alias Arkab.{Autostart, Updates}
-  alias ArkabWeb.Words
+  alias ArkabWeb.{Local, Words}
+
+  # Everything that changes something. The rest of the events are none.
+  @changing ~w(join update later update_check check_now autostart remove)
 
   @impl true
   def mount(_params, _session, socket) do
@@ -21,7 +30,13 @@ defmodule ArkabWeb.StatusLive do
 
     {:ok,
      socket
-     |> assign(joining?: false, message: nil, update_message: nil, checking?: false)
+     |> assign(
+       joining?: false,
+       message: nil,
+       update_message: nil,
+       checking?: false,
+       local?: Local.local_socket?(socket)
+     )
      |> load()}
   end
 
@@ -31,6 +46,10 @@ defmodule ArkabWeb.StatusLive do
   def handle_info(_other, socket), do: {:noreply, socket}
 
   @impl true
+  def handle_event(event, _params, %{assigns: %{local?: false}} = socket)
+      when event in @changing,
+      do: {:noreply, socket}
+
   def handle_event("join", %{"link" => link}, socket) do
     {:noreply,
      socket
@@ -121,7 +140,15 @@ defmodule ArkabWeb.StatusLive do
         Arkab.Bridge.status()
       catch
         :exit, _reason ->
-          %{name: "", servers: [], waiting: 0, ports: [], boards: [], recording?: false}
+          %{
+            name: "",
+            servers: [],
+            waiting: 0,
+            store: %{dropped: 0, error: nil},
+            ports: [],
+            boards: [],
+            recording?: false
+          }
       end
 
     assign(socket,
@@ -146,6 +173,12 @@ defmodule ArkabWeb.StatusLive do
         <p class="note">{Words.t(@locale, :tagline)}</p>
       </header>
 
+      <section :if={!@local?} id="read-only">
+        <h2>{Words.t(@locale, :read_only_title)}</h2>
+
+        <p>{Words.t(@locale, :read_only)}</p>
+      </section>
+
       <section :if={@notice} id="update">
         <h2>{Words.t(@locale, :update_available, version: @notice.version)}</h2>
 
@@ -161,7 +194,7 @@ defmodule ArkabWeb.StatusLive do
 
         <p :if={@notice.no_build} class="note">{Words.t(@locale, :update_no_build)}</p>
 
-        <form id="update-form" phx-submit="update">
+        <form :if={@local?} id="update-form" phx-submit="update">
           <button :if={@install_kind != :manual} id="update-button" type="submit">
             {Words.t(@locale, :update_install)}
           </button>
@@ -213,6 +246,7 @@ defmodule ArkabWeb.StatusLive do
             ></span> <span class="server-name">{server.name}</span>
             <span :if={!server.up? && server.error} class="note">{server.error}</span>
             <button
+              :if={@local?}
               id={"remove-#{server.id}"}
               type="button"
               phx-click="remove"
@@ -229,9 +263,17 @@ defmodule ArkabWeb.StatusLive do
         </p>
 
         <p id="waiting">{Words.t(@locale, :waiting)} <strong>{@status.waiting}</strong></p>
+
+        <p :if={@status.store.dropped > 0} id="store-dropped" class="error">
+          {Words.t(@locale, :store_dropped, n: @status.store.dropped)}
+        </p>
+
+        <p :if={@status.store.error} id="store-error" class="error">
+          {Words.t(@locale, :store_error, why: @status.store.error)}
+        </p>
       </section>
 
-      <section id="join">
+      <section :if={@local?} id="join">
         <h2>{Words.t(@locale, :join_title)}</h2>
 
         <form id="join-form" phx-submit="join">
@@ -295,7 +337,7 @@ defmodule ArkabWeb.StatusLive do
           {Words.t(@locale, :version)} <span class="mono">{Updates.current_version()}</span>
         </p>
 
-        <p>
+        <p :if={@local?}>
           <label>
             <input
               id="update-check"
@@ -307,7 +349,7 @@ defmodule ArkabWeb.StatusLive do
           </label>
         </p>
 
-        <p :if={Autostart.supported?()}>
+        <p :if={@local? and Autostart.supported?()}>
           <label>
             <input
               id="autostart"
@@ -319,7 +361,7 @@ defmodule ArkabWeb.StatusLive do
           </label>
         </p>
 
-        <p>
+        <p :if={@local?}>
           <button id="check-now" type="button" phx-click="check_now" disabled={@checking?}>
             {if @checking?, do: Words.t(@locale, :checking), else: Words.t(@locale, :check_now)}
           </button>

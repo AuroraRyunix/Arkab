@@ -38,7 +38,9 @@ window open, closing it stops the bridge; open the page it shows on port
 4050 and paste the join link from Alnasl (Halls, your hall, Bridges, *Add a bridge*).
 
 **Raspberry Pi and Linux**: run the one-line installer from the README;
-open `http://<the box>:4050`; paste the join link.
+open `http://localhost:4050` on the box itself (from your own computer: an SSH
+port forward, `ssh -L 4050:localhost:4050 user@box`, then the same address) and
+paste the join link. Seen from another computer the page is read-only.
 
 **Mac**: unzip, open `Arkab.app` (the first time with *Open Anyway*);
 paste the join link on the page.

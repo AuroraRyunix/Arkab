@@ -6,6 +6,9 @@
 #   sudo /opt/arkab/update.sh --version 0.3.0 that release
 #   sudo /opt/arkab/update.sh --from DIR      an unpacked release (no network)
 #
+# A request from the status page (--requested) is accepted only for a version
+# newer than the installed one; an older one is refused, not installed.
+#
 # The status page's "Download and install" ends up here too: the program
 # writes the version it wants into a file, a systemd path unit sees the
 # file, and arkab-update.service runs this script with --requested.
@@ -52,6 +55,25 @@ fail() {
 
 is_version() {
     printf '%s' "$1" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'
+}
+
+# Whether version $1 is newer than version $2 (both X.Y.Z, compared number
+# by number, so 0.10.0 is newer than 0.9.0). The same version is not newer.
+newer() {
+    for field in 1 2 3; do
+        a=$(printf '%s' "$1" | cut -d. -f"$field")
+        b=$(printf '%s' "$2" | cut -d. -f"$field")
+        [ "$a" -gt "$b" ] && return 0
+        [ "$a" -lt "$b" ] && return 1
+    done
+    return 1
+}
+
+# The installed version, from the symlink; nothing if there is none.
+installed_version() {
+    if [ -L "$INSTALL_DIR/current" ]; then
+        basename "$(readlink "$INSTALL_DIR/current")"
+    fi
 }
 
 arch() {
@@ -146,6 +168,20 @@ main() {
         wanted=$(head -c 32 "$REQUEST_FILE" 2>/dev/null | tr -d ' \t\r\n' || true)
         rm -f "$REQUEST_FILE"
         is_version "$wanted" || fail "?" "the request did not name a version"
+
+        # The request file is writable by the service's unprivileged user, and
+        # this script is root. The program only ever asks for a newer version,
+        # so anything else is not the program asking: an older release, put in
+        # place under a newer database, is the thing this refuses.
+        current=$(installed_version)
+        if [ "$current" = "$wanted" ]; then
+            say "$wanted is what is installed"
+            status "ok $wanted"
+            exit 0
+        fi
+        if [ -z "$current" ] || ! newer "$wanted" "$current"; then
+            fail "$wanted" "refused: $wanted is not newer than ${current:-the installed version}"
+        fi
     fi
 
     if [ -n "$wanted" ] && ! is_version "$wanted"; then
@@ -195,6 +231,11 @@ main() {
     old=""
     if [ -L "$INSTALL_DIR/current" ]; then
         old=$(basename "$(readlink "$INSTALL_DIR/current")")
+    fi
+
+    # The release says which version it is; a request is only for a newer one.
+    if [ "$requested" = 1 ] && [ "$old" != "$new" ] && ! newer "$new" "$old"; then
+        fail "$new" "refused: $new is not newer than $old"
     fi
 
     if [ "$old" = "$new" ] && [ -x "$INSTALL_DIR/releases/$new/bin/arkab" ]; then

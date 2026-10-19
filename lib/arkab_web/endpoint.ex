@@ -3,7 +3,14 @@ defmodule ArkabWeb.Endpoint do
 
   @session_options [store: :cookie, key: "_arkab_key", signing_salt: "q7Rb2kXa", same_site: "Lax"]
 
-  socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
+  # Before everything: a request that names a host the bridge does not
+  # answer to (DNS rebinding) gets a 403 and nothing else. See the plug.
+  plug ArkabWeb.HostGuard
+
+  # The peer and the forwarding headers go to the page, which lets only this
+  # machine change anything (`ArkabWeb.Local`).
+  socket "/live", Phoenix.LiveView.Socket,
+    websocket: [connect_info: [:peer_data, :x_headers, session: @session_options]]
 
   # Phoenix's and LiveView's own scripts, as their packages ship them: no
   # build step for a page this size.

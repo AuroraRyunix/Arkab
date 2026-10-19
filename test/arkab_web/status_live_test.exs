@@ -74,4 +74,68 @@ defmodule ArkabWeb.StatusLiveTest do
     view |> element("#update-later") |> render_click()
     refute has_element?(view, "#update")
   end
+
+  describe "from another machine on the network" do
+    defp lan(address \\ {192, 168, 1, 23}) do
+      Plug.Test.put_peer_data(build_conn(), %{address: address, port: 50_000, ssl_cert: nil})
+    end
+
+    test "the page is a read-only view: the servers show, no control is drawn" do
+      server = FakeServer.start(codes: ["P"])
+      {:ok, _id} = Bridge.join(FakeServer.link(server, "P"))
+      [%{id: id}] = Arkab.Bridge.Store.servers()
+
+      {:ok, view, html} = live(lan(), "/")
+
+      assert has_element?(view, "#read-only")
+      assert html =~ "Read-only view"
+      assert has_element?(view, "#server-#{id}")
+      refute has_element?(view, "#remove-#{id}")
+      refute has_element?(view, "#join-form")
+      refute has_element?(view, "#check-now")
+      refute has_element?(view, "#update-check")
+    end
+
+    test "it says so in Dutch too" do
+      conn =
+        lan()
+        |> get("/lang/nl")
+        |> recycle()
+        |> Plug.Test.put_peer_data(%{address: {10, 0, 0, 4}, port: 1, ssl_cert: nil})
+
+      {:ok, view, _html} = live(conn, "/")
+      assert has_element?(view, "#read-only", "Alleen-lezen")
+    end
+
+    test "an event sent by hand changes nothing" do
+      server = FakeServer.start(codes: ["P"])
+      {:ok, _id} = Bridge.join(FakeServer.link(server, "P"))
+      [%{id: id}] = Arkab.Bridge.Store.servers()
+      other = FakeServer.start(codes: ["Q"])
+
+      {:ok, view, _html} = live(lan(), "/")
+
+      render_hook(view, "remove", %{"id" => to_string(id)})
+      assert [%{id: ^id}] = Arkab.Bridge.Store.servers()
+
+      render_hook(view, "join", %{"link" => FakeServer.link(other, "Q")})
+      assert length(Arkab.Bridge.Store.servers()) == 1
+
+      render_hook(view, "update", %{})
+      render_hook(view, "autostart", %{"on" => "true"})
+      assert Process.alive?(view.pid)
+    end
+
+    test "a loopback peer behind a proxy header is not this machine" do
+      conn = build_conn() |> Plug.Conn.put_req_header("x-forwarded-for", "203.0.113.9")
+      {:ok, view, _html} = live(conn, "/")
+      assert has_element?(view, "#read-only")
+    end
+
+    test "this machine gets the controls" do
+      {:ok, view, _html} = live(build_conn(), "/")
+      refute has_element?(view, "#read-only")
+      assert has_element?(view, "#join-form")
+    end
+  end
 end

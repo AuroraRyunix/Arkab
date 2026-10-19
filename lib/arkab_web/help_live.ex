@@ -64,6 +64,18 @@ defmodule ArkabWeb.HelpLive do
         </p>
       </section>
 
+      <section id="help-remote">
+        <h2>Vanaf een andere computer</h2>
+
+        <p>
+          Iedereen op het netwerk van de zaal kan deze pagina openen en kijken: de servers, de wachtrij, de poorten en de borden. Aanpassen kan alleen op de brug zelf: aansluiten, een server verwijderen, bijwerken en de instellingen onder "Dit programma". Vanaf een andere computer staat bovenaan "Alleen-lezen weergave" en zijn die knoppen er niet.
+        </p>
+
+        <p>
+          Wil je de brug beheren zonder ernaast te zitten (een Raspberry Pi zonder scherm), zet dan op je eigen computer een SSH-poortdoorverwijzing op: <code>ssh -L 4050:localhost:4050 gebruiker@brug</code>, en open daarna <code>http://localhost:4050</code>. Voor de brug kom je dan van de brug zelf en heb je alle knoppen. Heeft de brug een eigen naam op het netwerk van de zaal die niet de computernaam is, zet die dan in <code>ARKAB_HOSTS</code>, anders antwoordt de pagina er niet op.
+        </p>
+      </section>
+
       <section id="help-servers">
         <h2>De lijst van servers</h2>
 
@@ -172,6 +184,18 @@ defmodule ArkabWeb.HelpLive do
 
         <p>
           One bridge can belong to more than one server, say the club's own box and the hosted server. Just join again with the next one's link.
+        </p>
+      </section>
+
+      <section id="help-remote">
+        <h2>From another computer</h2>
+
+        <p>
+          Anyone on the hall's network can open this page and look: the servers, the queue, the ports and the boards. Changing anything works on the bridge itself only: joining, removing a server, updating and the settings under "This program". From another computer the top of the page says "Read-only view" and those buttons are not there.
+        </p>
+
+        <p>
+          To manage a bridge without sitting beside it (a Raspberry Pi with no screen), set up an SSH port forward on your own computer: <code>ssh -L 4050:localhost:4050 user@bridge</code>, then open <code>http://localhost:4050</code>. To the bridge you then come from the bridge itself, and you have every button. If the bridge has a name of its own on the hall's network that is not the computer's name, put it in <code>ARKAB_HOSTS</code>, or the page will not answer to it.
         </p>
       </section>
 

@@ -167,7 +167,9 @@ main() {
     if [ "$local" = 1 ]; then
         say "               (only this box: ARKAB_LISTEN=local in /etc/arkab/arkab.env.)"
     else
-        say "               and http://<this box's address>:4050 from the hall's network."
+        say "               and http://<this box's address>:4050 from the hall's network,"
+        say "               to look (from there the page is read-only; to change anything"
+        say "               use the box itself, or ssh -L 4050:localhost:4050 <this box>)."
     fi
     say "  Next:        open the page and paste the join link of your Alnasl server."
     say "  The data:    $DATA_DIR"

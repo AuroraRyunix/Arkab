@@ -9,6 +9,10 @@ config :arkab, data_dir: Path.expand("../data", __DIR__)
 
 config :arkab, ArkabWeb.Endpoint,
   url: [host: "localhost"],
+  # The hosts the page answers to, not "localhost" alone (that locked every
+  # other machine out of the live page) and not "anything" (DNS rebinding):
+  # see `ArkabWeb.HostGuard`.
+  check_origin: {ArkabWeb.HostGuard, :origin_allowed?, []},
   adapter: Bandit.PhoenixAdapter,
   render_errors: [formats: [html: ArkabWeb.ErrorHTML], layout: false],
   pubsub_server: Arkab.PubSub,

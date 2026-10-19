@@ -139,4 +139,109 @@ defmodule Arkab.StoreTest do
     Store.sync(store)
     assert Store.pending(store, 5, 10) |> Enum.map(& &1["s"]) == [6]
   end
+
+  describe "when the queue cannot be kept" do
+    import ExUnit.CaptureLog
+
+    defp start_capped(path, opts) do
+      name = :"store_#{System.unique_integer([:positive])}"
+      pid = start_supervised!({Store, [path: path, name: name] ++ opts}, id: name)
+      {name, pid}
+    end
+
+    defp clock(store, t),
+      do:
+        Store.append(
+          store,
+          "COM3",
+          t,
+          nil,
+          {:clock, %{white_ms: t, black_ms: t, running: :white}}
+        )
+
+    defp kinds(store), do: store |> Store.pending(0, 1_000) |> Enum.map(& &1["e"]["k"])
+
+    test "a server that never comes back does not fill the disk: clocks go first", %{path: path} do
+      {store, _pid} = start_capped(path, soft_cap: 20, hard_cap: 100)
+      join(store, "ws://gone")
+
+      log =
+        capture_log(fn ->
+          for t <- 1..10, do: Store.append(store, "COM3", t, nil, {:position, Board.start()})
+          for t <- 11..60, do: clock(store, t)
+          Store.sync(store)
+        end)
+
+      kinds = kinds(store)
+      assert Enum.count(kinds, &(&1 == "pos")) == 10
+      assert length(kinds) <= 21
+      assert Store.waiting(store) == length(kinds)
+      assert %{dropped: dropped, error: nil} = Store.health(store)
+      assert dropped >= 29
+      assert log =~ "thrown away"
+      # The newest clock reading is the one that stays.
+      assert store |> Store.pending(0, 1_000) |> List.last() |> Map.fetch!("t") == 60
+    end
+
+    test "only past the hard cap do positions go, the oldest first", %{path: path} do
+      {store, _pid} = start_capped(path, soft_cap: 5, hard_cap: 8)
+      join(store, "ws://gone")
+
+      capture_log(fn ->
+        for t <- 1..30, do: Store.append(store, "COM3", t, nil, {:position, Board.start()})
+        Store.sync(store)
+      end)
+
+      times = store |> Store.pending(0, 1_000) |> Enum.map(& &1["t"])
+      assert length(times) <= 9
+      assert List.last(times) == 30
+      refute 1 in times
+      assert Store.health(store).dropped >= 21
+    end
+
+    test "a write the disk refuses is counted and shown, and the store lives", %{path: path} do
+      {store, pid} = start_capped(path, [])
+      join(store, "ws://a")
+      Store.append(store, "COM3", 1, nil, :connected)
+      Store.sync(store)
+
+      # Take the table away under it: every insert now fails.
+      {:ok, other} = Exqlite.Sqlite3.open(path)
+      :ok = Exqlite.Sqlite3.execute(other, "DROP TABLE events")
+      Exqlite.Sqlite3.close(other)
+
+      log =
+        capture_log(fn ->
+          Store.append(store, "COM3", 2, nil, :connected)
+          Store.append(store, "COM3", 3, nil, :disconnected)
+          Store.sync(store)
+        end)
+
+      assert Process.alive?(pid)
+      assert %{dropped: dropped, error: error} = Store.health(store)
+      assert dropped >= 1
+      assert is_binary(error)
+      assert log =~ "the write failed"
+    end
+
+    test "a file that is not a database is moved aside and the bridge starts fresh", %{path: path} do
+      File.mkdir_p!(Path.dirname(path))
+      File.write!(path, String.duplicate("this is not sqlite ", 500))
+
+      log =
+        capture_log(fn ->
+          {store, _pid} = start(path)
+          assert Store.servers(store) == []
+          join(store, "ws://a")
+          Store.append(store, "COM3", 1, nil, :connected)
+          Store.sync(store)
+          assert Store.waiting(store) == 1
+        end)
+
+      assert log =~ "moved to"
+      dir = Path.dirname(path)
+      assert [aside] = dir |> File.ls!() |> Enum.filter(&String.contains?(&1, ".corrupt-"))
+      assert File.read!(Path.join(dir, aside)) =~ "this is not sqlite"
+    end
+  end
 end
