@@ -370,6 +370,8 @@ defmodule Arkab.Driver.DgtBus do
               ref: ref,
               timer: Process.send_after(self(), {:no_answer, ref}, reply_ms(state, address)),
               at: now(),
+              first_byte_at: nil,
+              damaged: 0,
               tx: frame,
               rx: <<>>
             }
@@ -395,7 +397,7 @@ defmodule Arkab.Driver.DgtBus do
     if state.debug? or run_starts?(state, waiting.address) do
       Logger.warning(
         "board bus #{state.port}: #{waiting.address} did not answer #{waiting.kind} " <>
-          "within #{state.reply_ms} ms"
+          "within #{reply_ms(state, waiting.address)} ms: #{heard(waiting)}"
       )
     end
 
@@ -511,10 +513,14 @@ defmodule Arkab.Driver.DgtBus do
   defp still_talking(%{waiting: %{} = waiting} = state, bytes) do
     Process.cancel_timer(waiting.timer)
     timer = Process.send_after(self(), {:no_answer, waiting.ref}, state.reply_ms)
-    %{state | waiting: %{waiting | timer: timer, rx: waiting.rx <> bytes}}
+    first = waiting.first_byte_at || now()
+    %{state | waiting: %{waiting | timer: timer, rx: waiting.rx <> bytes, first_byte_at: first}}
   end
 
   defp still_talking(state, _bytes), do: state
+
+  defp answer({:bad_checksum, _address}, %{waiting: %{} = waiting} = state),
+    do: %{state | waiting: %{waiting | damaged: waiting.damaged + 1}}
 
   defp answer({:bad_checksum, _address}, state), do: state
 
@@ -588,6 +594,24 @@ defmodule Arkab.Driver.DgtBus do
   end
 
   defp stray(state, _address, _message), do: state
+
+  # What "did not answer" heard instead: silence, or bytes that were not an
+  # answer to it. A log line that says only "did not answer" cannot tell a
+  # board that is mute from a port that mangles what it says.
+  @heard_bytes 96
+
+  defp heard(%{rx: <<>>}), do: "nothing came back"
+
+  defp heard(waiting) do
+    shown = binary_part(waiting.rx, 0, min(byte_size(waiting.rx), @heard_bytes))
+    more = if byte_size(waiting.rx) > @heard_bytes, do: "...", else: ""
+
+    damaged =
+      if waiting.damaged > 0, do: ", #{waiting.damaged} damaged (bad checksum)", else: ""
+
+    "#{byte_size(waiting.rx)} bytes came back from #{waiting.first_byte_at - waiting.at} ms on" <>
+      "#{damaged}: #{Base.encode16(shown, case: :lower)}#{more}"
+  end
 
   defp reply_ms(state, address) do
     case state.boards[address] do

@@ -26,6 +26,25 @@ defmodule Arkab.DgtBusTest do
     end
   end
 
+  defmodule Mangled do
+    @moduledoc "A loop whose old board's long answers arrive with a wrong last byte."
+    alias Arkab.Dgt.Emulator
+
+    def handle([old | others], bytes) do
+      {said, old} = Emulator.handle(old, bytes)
+      {fast, others} = Emulator.handle(others, bytes)
+      {[mangle(said), fast], [old | others]}
+    end
+
+    defp mangle(said) when byte_size(said) > 20 do
+      size = byte_size(said) - 1
+      <<body::binary-size(^size), last>> = said
+      body <> <<Bitwise.band(last + 1, 0x7F)>>
+    end
+
+    defp mangle(said), do: said
+  end
+
   defp boards do
     [
       Emulator.new(address: 6310, serial: "06310", version: "1.9", bus?: true),
@@ -97,5 +116,16 @@ defmodule Arkab.DgtBusTest do
 
     assert log =~ "too late"
     assert log =~ "6310 did not answer"
+  end
+
+  test "a miss says what came back instead: nothing, or which bytes" do
+    log =
+      capture_log(fn ->
+        {_port, bus} = start_loop({Mangled, boards()}, "MANGLED")
+        assert wait_for(fn -> stats(bus)[6310].missed > 0 end, 8_000)
+      end)
+
+    assert log =~ ~r/6310 did not answer \w+ within \d+ ms: \d+ bytes came back/
+    assert log =~ "damaged (bad checksum)"
   end
 end
