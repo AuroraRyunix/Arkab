@@ -107,9 +107,13 @@ defmodule Arkab.DgtBusTest do
       capture_log(fn ->
         {_port, bus} = start_loop({Slow, {boards(), 260}}, "SLOW")
         assert wait_for(fn -> stats(bus)[6310].answered > 5 end, 15_000)
-        s = stats(bus)
         # It missed while the loop found out, not for ever; the other never.
-        assert s[6310].missed <= 2
+        # How many misses the finding out takes depends on how busy the
+        # machine is; that it stops does not.
+        learned = stats(bus)[6310].missed
+        assert wait_for(fn -> stats(bus)[6310].answered > 15 end, 15_000)
+        s = stats(bus)
+        assert s[6310].missed == learned
         assert s[12_799].missed == 0
         assert s[6310].connected?
       end)

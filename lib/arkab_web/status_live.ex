@@ -132,6 +132,7 @@ defmodule ArkabWeb.StatusLive do
   defp words(:used_or_expired, locale), do: Words.t(locale, :err_used_or_expired)
   defp words(:unreachable, locale), do: Words.t(locale, :err_unreachable)
   defp words(:version, locale), do: Words.t(locale, :err_version)
+  defp words(:elsewhere, locale), do: Words.t(locale, :err_elsewhere)
   defp words(_other, locale), do: Words.t(locale, :err_other)
 
   defp load(socket) do

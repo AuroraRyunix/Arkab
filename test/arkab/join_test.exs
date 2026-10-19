@@ -49,6 +49,12 @@ defmodule Arkab.JoinTest do
     assert length(Store.servers()) == 1
   end
 
+  test "a bridge still in another hall is told so, not that the server is not one" do
+    server = FakeServer.start()
+    assert Bridge.join(FakeServer.link(server, "ELS-WHR")) == {:error, :elsewhere}
+    assert Store.servers() == []
+  end
+
   test "a server that does not answer is said to be so, and nothing is stored" do
     server = FakeServer.start()
     FakeServer.down(server)
