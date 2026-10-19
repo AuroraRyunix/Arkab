@@ -14,6 +14,10 @@ config :arkab, ArkabWeb.Endpoint,
   # see `ArkabWeb.HostGuard`.
   check_origin: {ArkabWeb.HostGuard, :origin_allowed?, []},
   adapter: Bandit.PhoenixAdapter,
+  # At a stop, open connections (the status page left open in a browser,
+  # which is always) get three seconds to go, not Bandit's fifteen: fifteen
+  # plus the database was most of the launcher's twenty, and it looked hung.
+  http: [thousand_island_options: [shutdown_timeout: 3_000]],
   render_errors: [formats: [html: ArkabWeb.ErrorHTML], layout: false],
   pubsub_server: Arkab.PubSub,
   live_view: [signing_salt: "aRk4bL1v"]

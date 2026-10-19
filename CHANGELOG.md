@@ -15,6 +15,8 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+- [Fix] **Stopping Arkab stops Arkab, promptly.** With the status page open in a browser (which is to say, always), the server politely waited fifteen seconds for the page to hang up before it would go, then closed its database, and the Mac launcher's patience ran out at twenty. "Stopping Arkab..." sat there long enough to look like a hang. Open pages now get three seconds, as Polis and Nunki already gave them, and the Mac launcher writes into the log how long a stop took, or that it had to insist.
+
 ## [0.3.0] - 2026-10-19
 
 - [Security] **The status page no longer lets the hall's network press its buttons.** It listens on the hall's network by default and had no login, so anyone there could join the bridge to a server of their choosing, make it leave the real ones, or restart it mid-round. Everything that changes something (joining, removing a server, updating, the Windows start-up entry) now works only from the bridge itself, decided by the connection's peer address when the page opens and again for every event sent, never by a header. From another computer the page is a read-only view, marked as such in English and Dutch; to manage a bridge with no screen, forward the port over SSH. The help says so.
