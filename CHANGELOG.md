@@ -15,6 +15,8 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-10-19
+
 - [Fix] **A bridged board's "Signal" is no longer a percentage of the wrong thing.** The bridge sends one "answered" a second and every miss, so a loop board polled sixty times a second showed 95% with nine misses, and one that missed a handful per second showed 17%. The answer that is sent now says how many answers it stands for (`n` on the wire; a server that ignores it sees what it saw before), and the answers owed go out ahead of the next miss.
 - [Fix] **A board that answers a little late is no longer missing for ever.** On a loop, an answer that arrived after its 200 ms was thrown away as a stray, and the board was asked again, answered late again, and so counted missed on every poll. A late answer is now recognised by its address and kind, logged with how late it was, and that board is given that long plus 100 ms from then on (a second at most). The first miss of every run is logged too, with the board and the question.
 - [Fix] **Reading a port again waits for its old loop to let go.** On a Mac two programs can open the same serial device, and a rescan could start the single-board driver while the old bus was still asking: two askers, and the old boards answer neither.
