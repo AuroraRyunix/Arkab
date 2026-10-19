@@ -15,6 +15,8 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+- [Fix] **Stopping from Ascella, an update or a logout no longer hangs on "Stopping".** On a Mac, the window waited for its server to end inside the very queue that was to bring the news, so the server ended and the window kept saying "Stopping" until somebody force-quit it. Quit from the menu never had the problem, which is how it survived this long. Any stop that hangs anyway now ends after forty seconds.
+
 ## [0.3.4] - 2026-10-19
 
 - [Fix] **A join refused because the bridge is in another hall says so.** Alnasl turns away a link from a second hall while the bridge still sits in the first, and says exactly that. Arkab heard a 403 and announced that the address "answered, but not like a server", which was true of every server it had ever met. It now says the bridge has to be removed from the other hall first.
