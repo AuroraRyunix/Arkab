@@ -250,6 +250,17 @@ defmodule Arkab.ReleaseFilesTest do
       assert read("rel/macos/Launcher.swift") =~ "processTree(late.processIdentifier)"
     end
 
+    test "a stop does not wait fifteen seconds for an open page, and says how it went" do
+      # Bandit's default gives every open connection fifteen seconds at a
+      # stop; the status page is always open somewhere.
+      http = Application.fetch_env!(:arkab, ArkabWeb.Endpoint)[:http]
+      assert http[:thousand_island_options][:shutdown_timeout] <= 3_000
+
+      sh = read("rel/macos/launcher.sh")
+      assert sh =~ "Stopping: the server stopped after"
+      assert sh =~ "Stopping: still running after 20 seconds"
+    end
+
     test "the Mac icon has Apple's margin around the tile" do
       png = File.read!(Path.join(@root, "rel/macos/Arkab-icon.png"))
       assert <<0x89, "PNG", _::binary-size(12), width::32, height::32, _::binary>> = png
