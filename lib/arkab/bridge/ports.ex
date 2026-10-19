@@ -256,6 +256,28 @@ defmodule Arkab.Bridge.Ports do
     for id <- Board.ids(), elem(Protocol.parse_board_id(id), 0) == port do
       stop_board(state, id)
     end
+
+    await_bus_gone(port)
+  end
+
+  # The loop's bus lets go of the port when its last board has gone, which
+  # it learns from a message. A port read again before that is a port two
+  # drivers talk on at once (a Mac lets two programs open the same serial
+  # device), and what the old board hears is two askers.
+  defp await_bus_gone(port) do
+    case DgtBus.whereis(port) do
+      nil ->
+        :ok
+
+      pid ->
+        ref = Process.monitor(pid)
+
+        receive do
+          {:DOWN, ^ref, :process, _pid, _reason} -> :ok
+        after
+          2_000 -> Process.demonitor(ref, [:flush])
+        end
+    end
   end
 
   defp stop_board(state, id) do

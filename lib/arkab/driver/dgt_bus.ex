@@ -56,6 +56,15 @@ defmodule Arkab.Driver.DgtBus do
   `absent_ms` (2 s), so that the others are not kept waiting for it, and is
   back the moment it answers.
 
+  A board that answers after its time (the answer arrives while another
+  board is being asked) is not a board that is not there: the answer is
+  recognised by its address and its kind, logged with how late it was, and
+  that board is given that long plus 100 ms from then on, up to a second.
+  Without that, a board a little slower than the others would miss every
+  poll and its answers would be thrown away as strays, one question late,
+  for ever. The first miss of each run is logged too, so that a log says
+  which board missed which question.
+
   ## A board nobody told us about
 
   Every `discover_ms` (10 s) each board that is answering is told to sit out
@@ -96,6 +105,10 @@ defmodule Arkab.Driver.DgtBus do
     :discover_ms,
     :stranger
   ]
+
+  # The longest a board is ever given to begin an answer, once it has shown
+  # that it needs more than the default (it answered late, so it is there).
+  @slowest_reply_ms 1_000
 
   # --- a board on the bus ------------------------------------------------------
 
@@ -192,6 +205,9 @@ defmodule Arkab.Driver.DgtBus do
         stranger(Keyword.get(opts, :stranger) || Application.get_env(:arkab, :loop_stranger)),
       # The question out now: %{address, kind, timer, ref, at, tx, rx}
       waiting: nil,
+      # The last question that went unanswered: `{address, kind, asked_at}`.
+      # An answer to it that comes after all is a late answer, not a stray.
+      timed_out: nil,
       # Questions that go before the rotation: the discovery's.
       plan: [],
       # "Due now" is the time now, not 0: the monotonic clock may be negative.
@@ -229,6 +245,9 @@ defmodule Arkab.Driver.DgtBus do
       clock: nil,
       connected?: false,
       misses: 0,
+      # How long this board gets to begin an answer, when it has shown that
+      # the loop's default is too short for it.
+      reply_ms: nil,
       answered: 0,
       missed: 0,
       # What a board is asked before the rotation's usual questions.
@@ -349,7 +368,7 @@ defmodule Arkab.Driver.DgtBus do
               address: address,
               kind: kind,
               ref: ref,
-              timer: Process.send_after(self(), {:no_answer, ref}, state.reply_ms),
+              timer: Process.send_after(self(), {:no_answer, ref}, reply_ms(state, address)),
               at: now(),
               tx: frame,
               rx: <<>>
@@ -366,7 +385,19 @@ defmodule Arkab.Driver.DgtBus do
   def handle_info(:poll, state), do: {:noreply, state}
 
   def handle_info({:no_answer, ref}, %{waiting: %{ref: ref} = waiting} = state) do
-    state = %{state | waiting: nil, buffer: <<>>}
+    state = %{
+      state
+      | waiting: nil,
+        buffer: <<>>,
+        timed_out: {waiting.address, waiting.kind, waiting.at}
+    }
+
+    if state.debug? or run_starts?(state, waiting.address) do
+      Logger.warning(
+        "board bus #{state.port}: #{waiting.address} did not answer #{waiting.kind} " <>
+          "within #{state.reply_ms} ms"
+      )
+    end
 
     state =
       if is_map_key(state.boards, waiting.address),
@@ -504,7 +535,7 @@ defmodule Arkab.Driver.DgtBus do
       board =
         state.boards[address]
         |> answered()
-        |> raw(waiting, message)
+        |> into_capture(waiting, message)
         |> take(kind, message, address, t, state)
 
       put_in(state.boards[address], board)
@@ -536,7 +567,40 @@ defmodule Arkab.Driver.DgtBus do
       else: %{state | plan: state.plan ++ [{:verify, address}]}
   end
 
+  # The board did answer, but after the time it was given: how late says
+  # whether the answer time is too short for it (a number just over it) or
+  # the board was not there at all (no late answer, ever).
+  defp stray(%{timed_out: {address, kind, asked_at}} = state, address, message)
+       when is_map_key(state.boards, address) do
+    if fits?(kind, message) do
+      Logger.warning(
+        "board bus #{state.port}: #{address} answered #{kind} #{now() - asked_at} ms after " <>
+          "it was asked, #{now() - asked_at - state.reply_ms} ms too late"
+      )
+
+      # Given what it needs from now on, within reason.
+      late = now() - asked_at
+      state = %{state | timed_out: nil}
+      put_in(state.boards[address].reply_ms, min(late + 100, @slowest_reply_ms))
+    else
+      state
+    end
+  end
+
   defp stray(state, _address, _message), do: state
+
+  defp reply_ms(state, address) do
+    case state.boards[address] do
+      %{reply_ms: ms} when is_integer(ms) -> max(ms, state.reply_ms)
+      _none -> state.reply_ms
+    end
+  end
+
+  # One line for the first miss of a run, not one for each of the 300 a
+  # minute a board that is not there can make.
+  defp run_starts?(state, address) do
+    match?(%{misses: 0}, state.boards[address])
+  end
 
   defp fits?(:flush, {:changes, _}), do: true
   defp fits?(:changes, {:changes, _}), do: true
@@ -555,11 +619,11 @@ defmodule Arkab.Driver.DgtBus do
 
   # The bytes go into the capture when they said something: sixty "nothing
   # changed" a second would bury the rest.
-  defp raw(board, %{kind: kind}, message)
+  defp into_capture(board, %{kind: kind}, message)
        when kind == :ignore or (kind == :changes and message == {:changes, <<>>}),
        do: board
 
-  defp raw(board, waiting, _message) do
+  defp into_capture(board, waiting, _message) do
     Driver.emit(board.owner, board.id, {:raw, :tx, waiting.tx})
     Driver.emit(board.owner, board.id, {:raw, :rx, waiting.rx})
     board

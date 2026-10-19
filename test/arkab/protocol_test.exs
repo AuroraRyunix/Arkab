@@ -38,6 +38,7 @@ defmodule Arkab.ProtocolTest do
       :connected,
       :disconnected,
       {:poll, :ok},
+      {:poll, :ok, 57},
       {:poll, :missed},
       {:raw, :rx, <<0x8E, 0x00, 0x05, 52, 0x00>>},
       {:raw, :tx, <<0x42>>},

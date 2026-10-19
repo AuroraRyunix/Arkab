@@ -68,7 +68,7 @@ JSON text frames, each an object with a `"type"`.
 
 Raw serial bytes are never sent. They go to the bridge's own capture files
 while recording is on, and stay there. Successful polls are thinned to one
-a second; a missed poll is always sent.
+a second; a missed poll is always sent. The answer that is sent carries `"n"`, how many answers it stands for (left out when 1), so a server can count answered against missed; a server that ignores `n` reads one per second, as before, and a bridge that never sends it reads as one.
 
 ### Delivery
 

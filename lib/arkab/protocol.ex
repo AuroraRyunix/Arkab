@@ -171,6 +171,9 @@ defmodule Arkab.Protocol do
   def event_fields({:poll, result}) when result in [:ok, :missed],
     do: %{"k" => "poll", "v" => to_string(result)}
 
+  def event_fields({:poll, :ok, n}) when is_integer(n) and n > 1,
+    do: %{"k" => "poll", "v" => "ok", "n" => n}
+
   def event_fields({:raw, direction, bytes}) when direction in [:rx, :tx],
     do: %{"k" => to_string(direction), "h" => Base.encode16(bytes, case: :lower)}
 
@@ -225,6 +228,11 @@ defmodule Arkab.Protocol do
 
   defp event(%{"k" => "st", "v" => "connected"}), do: {:ok, :connected}
   defp event(%{"k" => "st", "v" => "disconnected"}), do: {:ok, :disconnected}
+  # "n": how many answers this one stands for (see `Arkab.Bridge.Board`).
+  # A bridge that does not say means one.
+  defp event(%{"k" => "poll", "v" => "ok", "n" => n}) when is_integer(n) and n > 1,
+    do: {:ok, {:poll, :ok, min(n, 1_000_000)}}
+
   defp event(%{"k" => "poll", "v" => "ok"}), do: {:ok, {:poll, :ok}}
   defp event(%{"k" => "poll", "v" => "missed"}), do: {:ok, {:poll, :missed}}
 
