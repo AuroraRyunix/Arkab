@@ -87,6 +87,10 @@ defmodule Arkab.Driver.DgtSerial do
       noise: 0,
       clock?: options["clock"] != false,
       clock_seen?: nil,
+      clock_asks: 0,
+      # What the board has not told us about itself yet, and how often it
+      # was asked.
+      unknown: %{serial: 0, version: 0},
       debug?: Keyword.get(opts, :debug, false) or options["debug"] == true,
       resync_ms: Keyword.get(opts, :resync_ms, 3_000),
       timeout_ms: Keyword.get(opts, :timeout_ms, 10_000),
@@ -102,7 +106,17 @@ defmodule Arkab.Driver.DgtSerial do
   def handle_info(:open, %{handle: nil} = state) do
     case state.transport.open(state.port, baud: Protocol.baud()) do
       {:ok, handle} ->
-        state = %{state | handle: handle, buffer: <<>>, board: nil, last_dump: now(), noise: 0}
+        state = %{
+          state
+          | handle: handle,
+            buffer: <<>>,
+            board: nil,
+            last_dump: now(),
+            noise: 0,
+            clock_seen?: nil,
+            clock_asks: 0,
+            unknown: %{serial: 0, version: 0}
+        }
 
         # Who is on this line? A single-board command on a loop is answered
         # by every board at once, so that is asked first, in the one way a
@@ -143,6 +157,7 @@ defmodule Arkab.Driver.DgtSerial do
       |> write(:version)
       |> write(:board)
       |> write(if(state.clock?, do: :update_nice, else: :update_board))
+      |> ask_clock()
 
     Process.send_after(self(), :resync, state.resync_ms)
     {:noreply, %{state | last_dump: now()}}
@@ -165,7 +180,7 @@ defmodule Arkab.Driver.DgtSerial do
 
       true ->
         Process.send_after(self(), :resync, state.resync_ms)
-        {:noreply, write(state, :board)}
+        {:noreply, state |> write(:board) |> ask_clock() |> ask_unknown()}
     end
   end
 
@@ -237,7 +252,13 @@ defmodule Arkab.Driver.DgtSerial do
     end
   end
 
-  defp message(other, state) do
+  defp message({kind, _} = other, state) when kind in [:serial, :version] do
+    message_info(other, %{state | unknown: Map.delete(state.unknown, kind)})
+  end
+
+  defp message(other, state), do: message_info(other, state)
+
+  defp message_info(other, state) do
     case Protocol.apply_message(other, state.board) do
       {:info, info} -> Driver.emit(state.owner, state.id, {:info, info})
       _ignored -> :ok
@@ -254,6 +275,35 @@ defmodule Arkab.Driver.DgtSerial do
   end
 
   # --- bytes out ---------------------------------------------------------------
+
+  # "Nice" update mode reports the clock only when its time changes. A clock
+  # that is switched on and standing still therefore says nothing at all, and
+  # the hall sees no clock where there plainly is one (2026-10-20). So it is
+  # asked: at the handshake and at each resync, until it has answered - with
+  # a time, or with "no clock here". A board that answers neither is asked
+  # @clock_asks times and then left alone; a clock plugged in later still
+  # speaks up the first time its time changes.
+  @clock_asks 5
+
+  defp ask_clock(%{clock?: true, clock_seen?: nil, clock_asks: asks} = state)
+       when asks < @clock_asks,
+       do: write(%{state | clock_asks: asks + 1}, :clock)
+
+  defp ask_clock(state), do: state
+
+  # The same for the serial number and the firmware: asked in the handshake
+  # straight after a reset, where a board can drop them, and then "Board" is
+  # all the status page has to say (2026-10-20). Asked again until answered,
+  # at most @clock_asks times each.
+  defp ask_unknown(state) do
+    Enum.reduce(state.unknown, state, fn
+      {kind, asks}, state when asks < @clock_asks ->
+        write(put_in(state.unknown[kind], asks + 1), kind)
+
+      _done, state ->
+        state
+    end)
+  end
 
   defp write(%{handle: nil} = state, _command), do: state
 
