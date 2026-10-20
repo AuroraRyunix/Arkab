@@ -54,6 +54,7 @@ trap cleanup EXIT
 
 printf '%s' "$MACOS_CERT_P12" | base64 --decode >"$work/cert.p12"
 printf '%s' "$ASC_KEY_P8" | base64 --decode >"$work/asc.p8"
+# Word-split on purpose below: mktemp paths have no spaces.
 notary_auth="--key $work/asc.p8 --key-id $ASC_KEY_ID --issuer $ASC_ISSUER_ID"
 # Ask OpenSSL first: Apple's importer says "wrong password?" for any reason
 # at all, and a fingerprint of the file tells which certificate CI was given.
@@ -110,7 +111,7 @@ ditto -c -k --keepParent "$app" "$work/notarise.zip"
 # --wait returns when Apple has decided, and a refusal is a decision: the
 # status is what says whether it was a yes.
 result=$(xcrun notarytool submit "$work/notarise.zip" \
-  --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD" \
+  $notary_auth \
   --wait --timeout 30m --output-format json)
 echo "$result"
 status=$(printf '%s' "$result" | plutil -extract status raw -o - -)
@@ -118,7 +119,7 @@ if [ "$status" != "Accepted" ]; then
   id=$(printf '%s' "$result" | plutil -extract id raw -o - -)
   echo "::error::notarisation said $status" >&2
   xcrun notarytool log "$id" \
-    --apple-id "$APPLE_ID" --team-id "$APPLE_TEAM_ID" --password "$APPLE_APP_PASSWORD" || true
+    $notary_auth || true
   exit 1
 fi
 xcrun stapler staple "$app"
