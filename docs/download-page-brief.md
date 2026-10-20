@@ -43,7 +43,7 @@ open `http://localhost:4050` on the box itself (from your own computer: an SSH
 port forward, `ssh -L 4050:localhost:4050 user@box`, then the same address) and
 paste the join link. Seen from another computer the page is read-only.
 
-**Mac**: unzip, open `Arkab.app` (the first time with *Open Anyway*);
+**Mac**: unzip, open `Arkab.app` (signed and notarised: it opens with no question);
 paste the join link on the page.
 
 ## What not to say

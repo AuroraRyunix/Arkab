@@ -15,6 +15,8 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+- [Change] **The Mac app is signed with a Developer ID and notarised by Apple.** Until now it was signed with nothing but good intentions, and every Mac that downloaded it asked the arbiter to override Gatekeeper by hand, which is a strange way to greet someone who just installed your software. The release workflow now signs every binary inside Arkab.app, hardened runtime and BEAM entitlements included, sends the bundle to Apple, staples the ticket and checks the verdict with `spctl` before the zip exists. A fork without the secrets still builds, with a warning, ad-hoc signed. The workflow can also be started by hand with *mac_only* to test all this without publishing anything.
+
 ## [0.3.6] - 2026-10-20
 
 - [Fix] **A clock that is switched on but not running now shows its time.** The bridge asked the board to mention the clock only when its time changed, and a stopped clock, being stopped, had nothing to mention. The hall saw no clock beside a clock that was plainly there. The bridge now asks for a reading when the board connects and keeps asking until the clock answers or says there isn't one, five times at most.
