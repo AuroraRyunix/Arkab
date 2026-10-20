@@ -15,6 +15,8 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+## [0.3.6] - 2026-10-20
+
 - [Fix] **A clock that is switched on but not running now shows its time.** The bridge asked the board to mention the clock only when its time changed, and a stopped clock, being stopped, had nothing to mention. The hall saw no clock beside a clock that was plainly there. The bridge now asks for a reading when the board connects and keeps asking until the clock answers or says there isn't one, five times at most.
 - [Fix] **The status page shows the board's serial number again instead of just "Board".** The serial number and firmware were asked for straight after a reset, which is exactly when a board is allowed not to listen. They are now asked again until answered, five times at most.
 
