@@ -15,6 +15,8 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+- [Change] **Releases carry signed build provenance.** Every file of a release, `SHA256SUMS` included, is now attested through GitHub and Sigstore, keyless, so `gh attestation verify <file> --repo teapot-chess/Arkab` can say who built it and from what. Until now the checksums vouched for a download only against the release they sat in, which is a witness who was hired by the defendant.
+
 ## [0.3.6] - 2026-10-20
 
 - [Fix] **A clock that is switched on but not running now shows its time.** The bridge asked the board to mention the clock only when its time changed, and a stopped clock, being stopped, had nothing to mention. The hall saw no clock beside a clock that was plainly there. The bridge now asks for a reading when the board connects and keeps asking until the clock answers or says there isn't one, five times at most.
