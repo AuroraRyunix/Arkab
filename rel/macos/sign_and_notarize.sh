@@ -55,6 +55,14 @@ trap cleanup EXIT
 printf '%s' "$MACOS_CERT_P12" | base64 --decode >"$work/cert.p12"
 printf '%s' "$ASC_KEY_P8" | base64 --decode >"$work/asc.p8"
 notary_auth="--key $work/asc.p8 --key-id $ASC_KEY_ID --issuer $ASC_ISSUER_ID"
+# Ask OpenSSL first: Apple's importer says "wrong password?" for any reason
+# at all, and a fingerprint of the file tells which certificate CI was given.
+if ! openssl pkcs12 -in "$work/cert.p12" -passin env:MACOS_CERT_PASSWORD -noout 2>"$work/openssl.err"; then
+  echo "::error::MACOS_CERT_PASSWORD does not open MACOS_CERT_P12 (p12 sha256 $(shasum -a 256 "$work/cert.p12" | cut -c1-16))" >&2
+  cat "$work/openssl.err" >&2
+  exit 1
+fi
+echo "p12 opens; sha256 $(shasum -a 256 "$work/cert.p12" | cut -c1-16)"
 security create-keychain -p "$keychain_password" "$keychain"
 security set-keychain-settings -lut 3600 "$keychain"
 security unlock-keychain -p "$keychain_password" "$keychain"
