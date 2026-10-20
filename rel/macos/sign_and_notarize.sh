@@ -92,8 +92,13 @@ sign() {
 # them as resources. The app's own executable, Contents/MacOS/<name> - the
 # compiled Launcher.swift - is signed by the last `sign`, the one on the
 # bundle, with the same hardened runtime and entitlements: codesign signs a
-# bundle's main executable as part of signing the bundle.
-find "$app/Contents/Resources" -type f -print0 | xargs -0 file | grep 'Mach-O' | cut -d: -f1 |
+# bundle's main executable as part of signing the bundle. Contents/Frameworks
+# exists only in the Intel build, where the Swift runtime is copied in for
+# macOS 10.13; Apple signed those dylibs, the notary wants ours.
+inner="$app/Contents/Resources"
+[ -d "$app/Contents/Frameworks" ] && inner="$inner $app/Contents/Frameworks"
+# Unquoted on purpose: two directories, and the build path has no spaces.
+find $inner -type f -print0 | xargs -0 file | grep 'Mach-O' | cut -d: -f1 |
   while IFS= read -r binary; do
     sign "$binary"
   done
