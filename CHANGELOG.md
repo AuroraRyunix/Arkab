@@ -15,6 +15,8 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+- [Fix] **An empty board list now says why, in the log.** When listing the serial ports failed, Arkab showed no boards and kept the reason to itself, which sent a hall on an old Mac reinstalling drivers that were working fine. The list is still empty; the server log now has the error.
+
 ## [0.3.7] - 2026-10-21
 
 - [Change] **The Mac app is signed with a Developer ID and notarised by Apple.** Until now it was signed with nothing but good intentions, and every Mac that downloaded it asked the arbiter to override Gatekeeper by hand, which is a strange way to greet someone who just installed your software. The release workflow now signs every binary inside Arkab.app, hardened runtime and BEAM entitlements included, sends the bundle to Apple, staples the ticket and checks the verdict with `spctl` before the zip exists. A fork without the secrets still builds, with a warning, ad-hoc signed. The workflow can also be started by hand with *mac_only* to test all this without publishing anything.
