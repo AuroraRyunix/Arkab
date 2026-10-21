@@ -47,9 +47,8 @@ curl -fsSL https://github.com/teapot-chess/Arkab/releases/latest/download/instal
 
 **Windows**: Windows says it does not know the program, as it does of any
 unsigned installer: "More info", then "Run anyway". The data is in
-`%LOCALAPPDATA%\ArkabData`, never in the install folder. **macOS**: open
-`Arkab.app` the first time with *Open Anyway* in System Settings; see
-[docs/macos.md](docs/macos.md).
+`%LOCALAPPDATA%\ArkabData`, never in the install folder. **macOS**: signed and
+notarised; unzip and open `Arkab.app`, see [docs/macos.md](docs/macos.md).
 
 An installed copy looks for a newer release now and then (one small request
 to GitHub, switched off by a checkbox on the status page) and offers it; it
