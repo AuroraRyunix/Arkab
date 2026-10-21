@@ -57,12 +57,9 @@ installs nothing without a yes. How releases are cut and what each file is:
 
 ## The bridge
 
-```sh
-mix deps.get
-mix run --no-halt          # or: iex -S mix
-```
+Install it from the table above; there is nothing to compile and no `mix` to run. A hall organiser needs a downloaded file and a browser, and the installers are built so that is all it takes: the Windows installer and the Linux script both start the bridge for you, and on a Mac you open `Arkab.app`. The bridge then keeps running by itself, and the status page described below is how you talk to it.
 
-Open `http://localhost:4050` on the bridge (or, from another computer, through
+Open `http://localhost:4050` on the machine the bridge runs on (or, from another computer, through
 an SSH port forward: `ssh -L 4050:localhost:4050 user@bridge`). Paste or scan the join link that Alnasl shows:
 Halls, your hall, Bridges, *Add a bridge* (Alnasl's Setup wizard leads
 there too). The link is good for fifteen minutes and one bridge. That is the
@@ -93,7 +90,22 @@ What the bridge promises:
 
 The link itself is described in [docs/protocol.md](docs/protocol.md).
 
-## As a dependency
+## For developers
+
+Everything below is for people working on Arkab or building on it. A hall never needs it, because the releases above already contain a built bridge.
+
+### Running from a checkout
+
+This starts the same bridge from source, which is what you want while changing it and nothing else:
+
+```sh
+mix deps.get
+mix run --no-halt          # or: iex -S mix
+```
+
+The status page, the variables and the promises above all apply as they are. A checkout keeps its data in `./data` unless `ARKAB_DATA` says otherwise.
+
+### As a dependency
 
 ```elixir
 {:arkab, git: "https://github.com/teapot-chess/Arkab.git", tag: "v0.1.0"}
@@ -105,7 +117,7 @@ the buses' registry and supervisor. Drivers send their owner
 that nobody reads yet is reported to the function in
 `config :arkab, loop_stranger: {Module, :function}`.
 
-## Tests
+### Tests
 
 ```sh
 mix test

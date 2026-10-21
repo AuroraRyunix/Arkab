@@ -15,6 +15,9 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+## [0.3.8] - 2026-10-21
+
+- [Change] **The README starts with the downloads, not with `mix`.** The part meant for a hall told its reader to run `mix deps.get`, which assumes the reader owns an Elixir toolchain and a grudge. The bridge section now points at the installers, and the source instructions have moved under a heading that says they are for developers.
 - [Fix] **An empty board list now says why, in the log.** When listing the serial ports failed, Arkab showed no boards and kept the reason to itself, which sent a hall on an old Mac reinstalling drivers that were working fine. The list is still empty; the server log now has the error.
 
 ## [0.3.7] - 2026-10-21
