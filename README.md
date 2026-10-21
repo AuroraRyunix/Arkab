@@ -23,6 +23,15 @@ addresses are the same for every release.
 | Mac, Intel (macOS 10.13 and newer) | [arkab-macos-x86_64.zip](https://github.com/teapot-chess/Arkab/releases/latest/download/arkab-macos-x86_64.zip) |
 | Checksums | [SHA256SUMS](https://github.com/teapot-chess/Arkab/releases/latest/download/SHA256SUMS) |
 
+**Checking a download.** From the next release on, every file in a release, `SHA256SUMS` included, carries signed build provenance: a GitHub artifact attestation, signed keylessly through Sigstore, so there is no key of ours to lose. With the [GitHub CLI](https://cli.github.com/):
+
+```sh
+gh attestation verify <file> --repo teapot-chess/Arkab
+sha256sum --check --ignore-missing SHA256SUMS
+```
+
+The first line says this exact file was built by this repository's release workflow. `SHA256SUMS` is attested too, so the second line is as trustworthy as the first.
+
 **Linux and the Raspberry Pi**, one line, as a service that starts with the
 machine (Debian 12, Ubuntu 22.04, Raspberry Pi OS "Bookworm" 64-bit, or
 newer; the runtime is inside):
