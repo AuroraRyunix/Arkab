@@ -20,6 +20,8 @@ defmodule Arkab.Transport.Uart do
 
   @behaviour Arkab.Transport
 
+  require Logger
+
   defp uart, do: Module.concat(["Circuits", "UART"])
 
   @impl true
@@ -39,7 +41,22 @@ defmodule Arkab.Transport.Uart do
       []
     end
   rescue
-    _error -> []
+    # Still an empty list - a port list that crashes the page helps nobody -
+    # but a logged one: "no boards" with the reason swallowed cost a hall on
+    # an old Mac an evening of reinstalling drivers that were fine.
+    error ->
+      Logger.warning(
+        "serial ports could not be listed: " <> Exception.format(:error, error, __STACKTRACE__)
+      )
+
+      []
+  catch
+    kind, reason ->
+      Logger.warning(
+        "serial ports could not be listed: " <> Exception.format(kind, reason, __STACKTRACE__)
+      )
+
+      []
   end
 
   @doc """
