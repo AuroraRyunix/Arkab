@@ -108,6 +108,37 @@ next time a disconnected one dials in.
 not accept the bridge's version says `refused "version"` and does not try
 to make sense of what follows. Version 1 is the only version so far.
 
+## The contract
+
+`priv/contracts/bridge-protocol-v1/` is this page as JSON Schema
+(draft-07): one `<message>.schema.json` per frame in either direction,
+shared definitions in `common.schema.json`, at least one example per
+schema in `examples/`, and `index.json` listing every file. Besides the
+WebSocket frames it covers the join request and answer, and
+`dgt-serial-opening`: the exact bytes, as hex, that `Arkab.Driver.DgtSerial`
+writes to a board's serial line when it opens it. Those bytes are not on
+the link, but Alnasl reads its boards with this driver and its tests take
+them apart, so they are pinned with the rest. There are no binary
+WebSocket frames; the only non-JSON frames are pings with an empty payload.
+
+`test/arkab/contract_test.exs` holds the contract to the code: every frame
+a live bridge sends must fit its schema, every server example must go
+through `Arkab.Protocol`'s decoder, every event example must decode and
+encode back to itself, and the serial opening must match byte for byte.
+
+The rules:
+
+- A change to the link, to `Arkab.Protocol`, or to the bytes the serial
+  driver opens with updates the schema and the examples **in the same pull
+  request**. The tests fail until it does.
+- Adding something the other side may ignore edits `-v1` in place.
+  Anything that breaks a reader that knows only v1 (a removed or renamed
+  field, a new required one, a changed meaning or unit) is a new directory,
+  `bridge-protocol-v2/`, and v1 stays until Alnasl no longer uses it.
+- Alnasl keeps a byte-identical copy in its own repository and checks it
+  against this one every day, so a change here that it has not taken in
+  turns its CI red rather than its hall.
+
 ## Why mint_web_socket
 
 The bridge is a WebSocket *client*: one outgoing socket per server, with

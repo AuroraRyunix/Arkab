@@ -24,3 +24,7 @@ config :arkab,
 # No launcher secret, no file in the data directory, no question to GitHub:
 # the tests that want them start them themselves.
 config :arkab, launcher_details: false, updates_timer: false
+
+# The contract's schemas refer to each other by their GitHub URLs; the tests
+# answer those from priv/contracts and never from GitHub (Arkab.Contract).
+config :ex_json_schema, :remote_schema_resolver, {Arkab.Contract, :resolve}

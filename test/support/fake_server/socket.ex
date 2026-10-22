@@ -11,6 +11,7 @@ defmodule Arkab.FakeServer.Socket do
   end
 
   def handle_in({text, opcode: :text}, state) do
+    Agent.update(state.agent, &%{&1 | frames: [text | &1.frames]})
     {:ok, frame} = Protocol.decode(text)
     handle(frame, state)
   end

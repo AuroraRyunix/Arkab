@@ -180,7 +180,10 @@ defmodule Arkab.MixProject do
       # The outgoing link. Mint is already here through Req; this is its
       # WebSocket half, by the same people. See docs/protocol.md.
       {:mint_web_socket, "~> 1.0"},
-      {:lazy_html, ">= 0.1.0", only: :test}
+      {:lazy_html, ">= 0.1.0", only: :test},
+      # The bridge-protocol contract (priv/contracts) is checked against JSON
+      # Schema in the tests; nothing of it ships.
+      {:ex_json_schema, "~> 0.11.5", only: :test}
     ] ++ uart()
   end
 
