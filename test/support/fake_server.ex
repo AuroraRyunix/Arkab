@@ -18,6 +18,8 @@ defmodule Arkab.FakeServer do
           codes: MapSet.new(Keyword.get(opts, :codes, ["K7Q-4MD"])),
           key: "fake-key-" <> Integer.to_string(System.unique_integer([:positive])),
           events: [],
+          # Every text frame the bridge sent, as it came, newest first.
+          frames: [],
           seen: 0,
           sockets: [],
           replies: [],
@@ -62,6 +64,7 @@ defmodule Arkab.FakeServer do
   end
 
   def events(server), do: get(server, :events) |> Enum.reverse()
+  def frames(server), do: get(server, :frames) |> Enum.reverse()
   def seqs(server), do: Enum.map(events(server), & &1.seq)
   def get(server, key), do: Agent.get(server.agent, &Map.fetch!(&1, key))
   def set(server, key, value), do: Agent.update(server.agent, &Map.put(&1, key, value))
