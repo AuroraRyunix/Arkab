@@ -15,6 +15,8 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+## [0.3.10] - 2026-10-22
+
 - [Fix] **A board that cannot be reached no longer eats the computer.** Every time Arkab tried a serial port that would not open - an adapter unplugged, a port another program held - it left behind the little helper program that talks to the port, and tried again a few seconds later. A day of that on a Mac came to 462 helpers and a system that refused to start anything else, Ascella included. A port that does not open now takes its helper with it.
 
 ## [0.3.9] - 2026-10-22
