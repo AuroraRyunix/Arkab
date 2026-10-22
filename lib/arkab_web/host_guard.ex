@@ -70,11 +70,8 @@ defmodule ArkabWeb.HostGuard do
   @doc "This machine's own names and interface addresses (the hall's network)."
   @spec lan_hosts() :: [String.t()]
   def lan_hosts do
-    names =
-      case :inet.gethostname() do
-        {:ok, name} -> [to_string(name), to_string(name) <> ".local"]
-        _ -> []
-      end
+    {:ok, name} = :inet.gethostname()
+    names = [to_string(name), to_string(name) <> ".local"]
 
     addresses =
       case :inet.getifaddrs() do

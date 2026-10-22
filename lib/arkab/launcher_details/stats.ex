@@ -304,8 +304,6 @@ defmodule Arkab.LauncherDetails.Stats do
   defp mb(nil, _nl?), do: "—"
   defp mb(bytes, nl?), do: "#{num(bytes / @mb, 1, nl?)} MB"
 
-  defp num(value, 0, _nl?), do: value |> round() |> Integer.to_string()
-
   defp num(value, decimals, nl?) do
     text = :erlang.float_to_binary(value / 1, decimals: decimals)
     if nl?, do: String.replace(text, ".", ","), else: text
