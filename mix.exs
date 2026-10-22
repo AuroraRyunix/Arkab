@@ -10,6 +10,13 @@ defmodule Arkab.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
+      dialyzer: [
+        ignore_warnings: ".dialyzer_ignore.exs",
+        plt_add_apps: [:mix, :ex_unit],
+        plt_local_path: "priv/plts",
+        plt_core_path: "priv/plts",
+        flags: [:error_handling, :unknown, :extra_return, :missing_return]
+      ],
       releases: releases()
     ]
   end
@@ -167,6 +174,7 @@ defmodule Arkab.MixProject do
       # Security tooling, wired into `precommit` and CI; never part of a release.
       {:mix_audit, "~> 2.1", only: [:dev, :test], runtime: false},
       {:sobelow, "~> 0.16", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:phoenix_html, "~> 4.1"},
       {:phoenix_live_view, "~> 1.2.0"},
       {:bandit, "~> 1.5"},

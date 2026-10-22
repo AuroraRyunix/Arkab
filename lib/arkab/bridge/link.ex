@@ -349,15 +349,18 @@ defmodule Arkab.Bridge.Link do
   defp send_frame(%{websocket: nil} = state, _frame), do: state
 
   defp send_frame(state, frame) do
-    with {:ok, websocket, data} <- Mint.WebSocket.encode(state.websocket, frame),
-         {:ok, conn} <- Mint.WebSocket.stream_request_body(state.conn, state.ref, data) do
-      %{state | websocket: websocket, conn: conn}
-    else
-      {:error, %Mint.WebSocket{} = websocket, reason} ->
-        lost(%{state | websocket: websocket}, reason)
+    # Two calls, two kinds of error: encode hands back the websocket, the
+    # request body hands back the connection. (Not told apart by matching on
+    # %Mint.WebSocket{}: that type is opaque.)
+    case Mint.WebSocket.encode(state.websocket, frame) do
+      {:ok, websocket, data} ->
+        case Mint.WebSocket.stream_request_body(state.conn, state.ref, data) do
+          {:ok, conn} -> %{state | websocket: websocket, conn: conn}
+          {:error, conn, reason} -> lost(%{state | conn: conn}, reason)
+        end
 
-      {:error, conn, reason} ->
-        lost(%{state | conn: conn}, reason)
+      {:error, websocket, reason} ->
+        lost(%{state | websocket: websocket}, reason)
     end
   end
 

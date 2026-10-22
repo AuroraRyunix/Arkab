@@ -11,3 +11,6 @@ arkab-*.tar
 # The bridge's own data: the queue, its servers' keys, its captures.
 /data/
 rel/windows/velopack_libc.dll
+
+# Dialyzer PLTs
+/priv/plts/
