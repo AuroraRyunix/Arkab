@@ -87,9 +87,21 @@ defmodule Arkab.Transport.Uart do
         active: true
       ]
 
-      with {:ok, pid} <- apply(uart(), :start_link, []),
-           :ok <- apply(uart(), :open, [pid, port, settings]) do
-        {:ok, pid}
+      # Every UART process runs a helper program of its own, and a driver
+      # retries a port that will not open from the same process, over and
+      # over. A failed open used to keep its UART: one stray helper per try,
+      # four hundred and sixty-two of them by the next afternoon, and then a
+      # Mac with no processes left for anybody. A port that does not open
+      # takes its UART down with it.
+      with {:ok, pid} <- apply(uart(), :start_link, []) do
+        case apply(uart(), :open, [pid, port, settings]) do
+          :ok ->
+            {:ok, pid}
+
+          failed ->
+            close(pid)
+            {:error, with({:error, reason} <- failed, do: reason)}
+        end
       else
         {:error, reason} -> {:error, reason}
         other -> {:error, other}

@@ -15,6 +15,10 @@ tagged so that a version can be skimmed:
 
 ## [Unreleased]
 
+## [0.3.10] - 2026-10-22
+
+- [Fix] **A board that cannot be reached no longer eats the computer.** Every time Arkab tried a serial port that would not open - an adapter unplugged, a port another program held - it left behind the little helper program that talks to the port, and tried again a few seconds later. A day of that on a Mac came to 462 helpers and a system that refused to start anything else, Ascella included. A port that does not open now takes its helper with it.
+
 ## [0.3.9] - 2026-10-22
 
 - [Feature] **The link has a contract, in files a machine can check.** `priv/contracts/bridge-protocol-v1/` holds a JSON Schema and an example for every frame the bridge and the server send each other, the join request and answer, and the exact bytes the bridge writes to a DGT board when it opens the line. The tests hold it to the code: the frames a live bridge really sends must fit, the server's examples must go through the bridge's own decoder, and the serial opening must match byte for byte. The last time those bytes changed, Alnasl found out by having a test fall over two releases later; next time it can find out from a diff.
