@@ -67,8 +67,16 @@ whole setup: the bridge fetches its own key, and the server decides which
 table each board belongs to. The page is open to the hall's network for
 looking, but from another computer it is a read-only view (servers, queue,
 ports, boards), marked as such: joining, removing a server, updating and the
-settings work from the bridge itself only (the peer address of the connection
-decides, never a header; an SSH port forward counts as the bridge itself). A
+settings work from the bridge itself (the peer address of the connection
+decides, never a header; an SSH port forward counts as the bridge itself) or from
+a browser unlocked with the **remote PIN**: set one on the bridge itself under
+"This program" (4 characters at least, kept only as a salted PBKDF2 hash), and the
+read-only banner elsewhere offers "Enter PIN"; the right PIN gives that browser
+every button for 12 hours (also behind `tailscale serve` or a reverse proxy,
+which still count as remote), changing or removing the PIN locks them all again,
+and five wrong tries lock an address out for five minutes. The PIN can only be
+set from the bridge itself. The page is plain HTTP, so the PIN crosses the hall's
+network in clear: a lock for the hall, not security against the internet. A
 request that asks for a host the bridge does not answer to gets a 403. The page speaks English and Dutch, the choice
 kept in a cookie; `/help` says what the page's parts mean.
 

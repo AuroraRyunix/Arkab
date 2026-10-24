@@ -1,7 +1,13 @@
 defmodule ArkabWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :arkab
 
-  @session_options [store: :cookie, key: "_arkab_key", signing_salt: "q7Rb2kXa", same_site: "Lax"]
+  @session_options [
+    store: :cookie,
+    key: "_arkab_key",
+    signing_salt: "q7Rb2kXa",
+    encryption_salt: "Zp4nVd8s",
+    same_site: "Lax"
+  ]
 
   # Before everything: a request that names a host the bridge does not
   # answer to (DNS rebinding) gets a 403 and nothing else. See the plug.

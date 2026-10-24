@@ -1,6 +1,6 @@
 CI.System: Command Injection via `System` function,lib/arkab/autostart.ex:68,18D70AF
 Config.CSP: Missing Content-Security-Policy,lib/arkab_web/router.ex:11,53D17C4
-Config.CSWH: Cross-Site Websocket Hijacking,lib/arkab_web/endpoint.ex:12,267A869
+Config.CSWH: Cross-Site Websocket Hijacking,lib/arkab_web/endpoint.ex:18,23FA466
 Config.HTTPS: HTTPS Not Enabled,config/prod.exs:0,2B5C077
 Traversal.FileModule: Directory Traversal in `File.chmod`,lib/arkab/launcher_details.ex:155,55344D6
 Traversal.FileModule: Directory Traversal in `File.chmod`,lib/arkab/launcher_details.ex:160,781955B
@@ -14,12 +14,12 @@ Traversal.FileModule: Directory Traversal in `File.open`,lib/arkab/recorder.ex:1
 Traversal.FileModule: Directory Traversal in `File.read`,lib/arkab/capture.ex:63,2940F15
 Traversal.FileModule: Directory Traversal in `File.read`,lib/arkab/launcher_details/cli.ex:265,4413F15
 Traversal.FileModule: Directory Traversal in `File.read`,lib/arkab/updates.ex:384,EBBAE1
-Traversal.FileModule: Directory Traversal in `File.read`,lib/arkab_web/endpoint.ex:61,3EAB6A9
+Traversal.FileModule: Directory Traversal in `File.read`,lib/arkab_web/endpoint.ex:67,29757F3
 Traversal.FileModule: Directory Traversal in `File.rm`,lib/arkab/launcher_details.ex:131,588A32
 Traversal.FileModule: Directory Traversal in `File.rm`,lib/arkab/recorder.ex:149,2FEA606
-Traversal.FileModule: Directory Traversal in `File.write!`,lib/arkab_web/endpoint.ex:67,178A07D
+Traversal.FileModule: Directory Traversal in `File.write!`,lib/arkab_web/endpoint.ex:73,231F395
 Traversal.FileModule: Directory Traversal in `File.write`,lib/arkab/launcher_details.ex:159,7944FD6
 Traversal.FileModule: Directory Traversal in `File.write`,lib/arkab/launcher_details.ex:161,6C7610
 Traversal.FileModule: Directory Traversal in `File.write`,lib/arkab/updates.ex:364,5A4A0C9
 XSS.Raw: XSS,lib/arkab_web/components.ex:12,4FEAC9B
-XSS.SendResp: XSS in `send_resp`,lib/arkab_web/endpoint.ex:46,259C26E
+XSS.SendResp: XSS in `send_resp`,lib/arkab_web/endpoint.ex:52,7E2B6D
