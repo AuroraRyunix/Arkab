@@ -90,6 +90,22 @@ defmodule ArkabWeb.PinTest do
       assert {:ok, _grant} = Pin.attempt("2468", :other)
     end
 
+    test "fifty guesses at once still get five tries between them" do
+      Pin.set("2468")
+
+      answers =
+        1..50
+        |> Task.async_stream(fn _ -> Pin.attempt("0000", :peer) end, max_concurrency: 50)
+        |> Enum.map(fn {:ok, answer} -> answer end)
+
+      assert Enum.count(answers, &(&1 == {:error, :wrong})) == 5
+
+      assert Enum.all?(
+               answers -- List.duplicate({:error, :wrong}, 5),
+               &match?({:error, {:locked, _}}, &1)
+             )
+    end
+
     test "a right PIN clears the count" do
       Pin.set("2468")
       for _ <- 1..4, do: Pin.attempt("0000", :peer)

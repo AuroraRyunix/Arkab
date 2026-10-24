@@ -22,23 +22,37 @@ defmodule ArkabWeb.Pin.Throttle do
     {:ok, nil}
   end
 
-  @doc "Seconds left of the lockout for `key`, or 0."
-  @spec locked_for(term()) :: non_neg_integer()
-  def locked_for(key) do
-    case lookup(key) do
-      {_wrong, until} when is_integer(until) -> max(until - now(), 0)
-      _ -> 0
-    end
+  @doc """
+  Takes one guess for `key` before the PIN is hashed: `:ok`, or
+  `{:locked, seconds}`. Counted up front and one at a time through this
+  process, because the hash takes a while and a count made after it let a
+  burst of simultaneous guesses all walk past a lockout none of them had
+  recorded yet. The fifth guess starts the lockout; a right one is
+  `clear/1`ed afterwards. If the counter is not there to ask, nobody guesses.
+  """
+  @spec claim(term()) :: :ok | {:locked, pos_integer()}
+  def claim(key) do
+    GenServer.call(__MODULE__, {:claim, key})
+  catch
+    :exit, _reason -> {:locked, @lockout}
   end
 
-  @doc "Counts a wrong guess; the fifth starts the lockout."
-  def fail(key) do
+  @impl true
+  def handle_call({:claim, key}, _from, state) do
     {wrong, until} = lookup(key) || {0, nil}
-    expired? = is_integer(until) and until <= now()
-    wrong = if expired?, do: 1, else: wrong + 1
-    until = if wrong >= @max_wrong, do: now() + @lockout
-    insert(key, {wrong, until})
-    :ok
+
+    reply =
+      cond do
+        is_integer(until) and until > now() ->
+          {:locked, until - now()}
+
+        true ->
+          wrong = if is_integer(until), do: 1, else: wrong + 1
+          insert(key, {wrong, if(wrong >= @max_wrong, do: now() + @lockout)})
+          :ok
+      end
+
+    {:reply, reply, state}
   end
 
   @doc "A right guess, or the lockout's end: the slate is clean."

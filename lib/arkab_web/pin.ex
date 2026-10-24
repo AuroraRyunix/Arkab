@@ -71,12 +71,11 @@ defmodule ArkabWeb.Pin do
           {:ok, map()} | {:error, :wrong | :none | {:locked, pos_integer()}}
   def attempt(pin, peer) when is_binary(pin) do
     with %{"hash" => stored} = pin_setting <- setting(),
-         {:locked, 0} <- {:locked, Throttle.locked_for(peer)} do
+         :ok <- Throttle.claim(peer) do
       if matches?(pin, pin_setting, stored) do
         Throttle.clear(peer)
         {:ok, %{"gen" => pin_setting["gen"], "until" => now() + @grant_seconds}}
       else
-        Throttle.fail(peer)
         {:error, :wrong}
       end
     else
