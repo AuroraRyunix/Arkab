@@ -68,11 +68,17 @@ defmodule ArkabWeb.HelpLive do
         <h2>Vanaf een andere computer</h2>
 
         <p>
-          Iedereen op het netwerk van de zaal kan deze pagina openen en kijken: de servers, de wachtrij, de poorten en de borden. Aanpassen kan alleen op de brug zelf: aansluiten, een server verwijderen, bijwerken en de instellingen onder "Dit programma". Vanaf een andere computer staat bovenaan "Alleen-lezen weergave" en zijn die knoppen er niet.
+          Iedereen op het netwerk van de zaal kan deze pagina openen en kijken: de servers, de wachtrij, de poorten en de borden. Aanpassen kan op de brug zelf, of in een browser die met de pincode voor op afstand is ontgrendeld (hieronder): aansluiten, een server verwijderen, bijwerken en de instellingen onder "Dit programma". Vanaf een andere computer staat bovenaan "Alleen-lezen weergave" en zijn die knoppen er niet.
         </p>
 
         <p>
           Wil je de brug beheren zonder ernaast te zitten (een Raspberry Pi zonder scherm), zet dan op je eigen computer een SSH-poortdoorverwijzing op: <code>ssh -L 4050:localhost:4050 gebruiker@brug</code>, en open daarna <code>http://localhost:4050</code>. Voor de brug kom je dan van de brug zelf en heb je alle knoppen. Heeft de brug een eigen naam op het netwerk van de zaal die niet de computernaam is, zet die dan in <code>ARKAB_HOSTS</code>, anders antwoordt de pagina er niet op.
+        </p>
+
+        <p>
+          De andere manier is een pincode voor op afstand. Stel op de brug zelf, onder "Dit programma", een pincode van minstens 4 tekens in. Daarna biedt de alleen-lezenbanner op een andere computer (een telefoon of laptop op het netwerk van de zaal, of via
+          <code>tailscale serve</code>
+          of een reverse proxy) "Pincode invoeren" aan, en de juiste pincode geeft die browser 12 uur lang alle knoppen, of tot je op "Weer vergrendelen" drukt. Een pincode wijzigen of verwijderen vergrendelt alle ontgrendelde browsers weer. Vijf foute pogingen sluiten een adres 5 minuten buiten. De pincode instellen, wijzigen of verwijderen kan alleen op de brug zelf, nooit vanuit een ontgrendelde browser. De pagina draait op gewoon HTTP, dus de pincode gaat onversleuteld over het netwerk van de zaal: het is een slot voor de zaal, geen beveiliging tegen het internet. Zonder pincode verandert er niets: vanaf een andere computer blijft de pagina alleen-lezen.
         </p>
       </section>
 
@@ -191,11 +197,17 @@ defmodule ArkabWeb.HelpLive do
         <h2>From another computer</h2>
 
         <p>
-          Anyone on the hall's network can open this page and look: the servers, the queue, the ports and the boards. Changing anything works on the bridge itself only: joining, removing a server, updating and the settings under "This program". From another computer the top of the page says "Read-only view" and those buttons are not there.
+          Anyone on the hall's network can open this page and look: the servers, the queue, the ports and the boards. Changing anything works on the bridge itself, or in a browser unlocked with the remote PIN (below): joining, removing a server, updating and the settings under "This program". From another computer the top of the page says "Read-only view" and those buttons are not there.
         </p>
 
         <p>
           To manage a bridge without sitting beside it (a Raspberry Pi with no screen), set up an SSH port forward on your own computer: <code>ssh -L 4050:localhost:4050 user@bridge</code>, then open <code>http://localhost:4050</code>. To the bridge you then come from the bridge itself, and you have every button. If the bridge has a name of its own on the hall's network that is not the computer's name, put it in <code>ARKAB_HOSTS</code>, or the page will not answer to it.
+        </p>
+
+        <p>
+          The other way is a remote PIN. On the bridge itself, under "This program", set a PIN of at least 4 characters. From then on the read-only banner on another computer (a phone or laptop on the hall's network, or through
+          <code>tailscale serve</code>
+          or a reverse proxy) offers "Enter PIN", and the right PIN gives that browser every button for 12 hours, or until you press "Lock again". Changing or removing the PIN locks every unlocked browser again. Five wrong tries lock an address out for 5 minutes. The PIN can only be set, changed or removed on the bridge itself, never from an unlocked browser. The page is plain HTTP, so the PIN crosses the hall's network in clear: it is a lock for the hall, not security against the internet. Without a PIN nothing changes: from another computer the page stays read-only.
         </p>
       </section>
 

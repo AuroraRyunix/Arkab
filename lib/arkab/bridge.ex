@@ -77,7 +77,7 @@ defmodule Arkab.Bridge do
   defp web(opts) do
     if Keyword.get(opts, :web, false) do
       ArkabWeb.Endpoint.ensure_secret(Path.join(Keyword.fetch!(opts, :data_dir), "secret"))
-      [ArkabWeb.Endpoint]
+      [ArkabWeb.Pin.Throttle, ArkabWeb.Endpoint]
     else
       []
     end

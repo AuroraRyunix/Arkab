@@ -14,6 +14,9 @@ defmodule ArkabWeb.Router do
   scope "/", ArkabWeb do
     pipe_through :browser
     get "/lang/:code", LangController, :set
+    get "/unlock", PinController, :show
+    post "/unlock", PinController, :unlock
+    get "/lock", PinController, :lock
 
     live_session :default, on_mount: {ArkabWeb.Locale, :default} do
       live "/", StatusLive, :index
