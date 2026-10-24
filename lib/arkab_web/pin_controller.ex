@@ -42,10 +42,5 @@ defmodule ArkabWeb.PinController do
     conn |> delete_session(Pin.session_key()) |> redirect(to: "/")
   end
 
-  defp peer(conn) do
-    case get_peer_data(conn) do
-      %{address: address} -> address
-      _none -> :unknown
-    end
-  end
+  defp peer(conn), do: get_peer_data(conn).address
 end
